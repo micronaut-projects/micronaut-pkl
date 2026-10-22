@@ -1,3 +1,14 @@
 plugins {
     id "io.micronaut.build.internal.parent"
 }
+
+if (System.getenv("SONAR_TOKEN") != null) {
+    sonarqube {
+        properties {
+            // The test suites are sample applications exercised by their own tests and native images,
+            // not library code; they do not feed the aggregated JaCoCo report, so leave them out of
+            // the coverage measure while still analysing them for issues.
+            property "sonar.coverage.exclusions", "**/test-suite-*/**"
+        }
+    }
+}
