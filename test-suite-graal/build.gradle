@@ -1,0 +1,42 @@
+plugins {
+    id 'io.micronaut.build.internal.pkl-base'
+    id 'io.micronaut.application'
+}
+
+dependencies {
+    implementation projects.micronautPkl
+    implementation mn.micronaut.http.server.netty
+    implementation mn.micronaut.jackson.databind
+    implementation mnLogging.logback.classic
+
+    testImplementation mn.micronaut.http.client
+    testImplementation mnTest.micronaut.test.junit5
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// pkl-core depends on the Truffle release it was built with; native-image refuses to build when that
+// polyglot version is older than the GraalVM doing the build, so align it with the GraalVM in use.
+// The image uses Truffle's fallback (interpreter-only) runtime, which is sufficient for evaluating
+// configuration at startup; adding org.graalvm.truffle:truffle-runtime would enable runtime compilation.
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group in ['org.graalvm.truffle', 'org.graalvm.polyglot', 'org.graalvm.sdk']) {
+            details.useVersion(libs.versions.graal.get())
+            details.because('Truffle must match the GraalVM that builds the native image')
+        }
+    }
+}
+
+micronaut {
+    importMicronautPlatform = false
+    runtime 'netty'
+    testRuntime 'junit5'
+}
+
+graalvmNative {
+    binaries {
+        all {
+            buildArgs.add('-H:+ReportExceptionStackTraces')
+        }
+    }
+}

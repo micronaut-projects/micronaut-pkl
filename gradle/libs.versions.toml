@@ -17,12 +17,17 @@
 
 [versions]
 micronaut = "5.2.2"
+micronaut-gradle-plugin = "5.0.2"
+# GraalVM polyglot/Truffle artifacts used by the native test suite. Must be at least the version of the
+# GraalVM that builds the image, or native-image fails its polyglot version check.
+graal = "25.4.4.1.1"
 # Managed versions appear in the BOM
 managed-pkl = "0.32.2"
 
 [libraries]
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
+gradle-micronaut = { module = "io.micronaut.gradle:micronaut-gradle-plugin", version.ref = "micronaut-gradle-plugin" }
 
 #
 # Managed dependencies appear in the BOM
