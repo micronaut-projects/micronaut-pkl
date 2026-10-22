@@ -1,0 +1,103 @@
+Pkl's main advantage over YAML is validation: a module that amends a typed schema is checked for unknown properties, wrong types and out-of-range values when it is evaluated, and the Pkl IDE plugins use the same schema for completion and hover documentation.
+
+Micronaut already ships the information needed for such a schema: every module packages one JSON Schema per `@ConfigurationProperties` and `@EachProperty` class under `META-INF/micronaut-configuration-schemas/`. The `micronaut-pkl-generator` module turns the schemas found on an application's classpath into a single Pkl module, so the schema reflects exactly the modules the application depends on, at their exact versions.
+
+dependency:micronaut-pkl-generator[groupId="io.micronaut.pkl",scope="runtimeOnly"]
+
+=== Generating the module
+
+Run the generator with the application's runtime classpath. With Gradle, a `JavaExec` task keeps the module current:
+
+.build.gradle
+[source,groovy]
+----
+configurations {
+    pklGenerator
+}
+
+dependencies {
+    pklGenerator "io.micronaut.pkl:micronaut-pkl-generator"
+}
+
+tasks.register("generatePklSchema", JavaExec) {
+    classpath = configurations.pklGenerator + sourceSets.main.runtimeClasspath
+    mainClass = "io.micronaut.pkl.generator.PklSchemaGeneratorCli"
+    args "--out", layout.projectDirectory.file("src/main/resources/Micronaut.pkl")
+}
+----
+
+Without `--classpath` the generator uses the schemas visible to its own class loader, which is the task's classpath above. Alternatively pass explicit JARs and class directories:
+
+[source,bash]
+----
+java -cp micronaut-pkl-generator.jar:... io.micronaut.pkl.generator.PklSchemaGeneratorCli \
+    --classpath build/classes/java/main:lib/micronaut-http-server-netty-5.2.2.jar \
+    --out src/main/resources/Micronaut.pkl
+----
+
+The same can be done programmatically with api:pkl.generator.SchemaLocator[] and api:pkl.generator.PklSchemaGenerator[]. The application's own `@ConfigurationProperties` classes are included when the application's class output is on the classpath, because the Micronaut annotation processor emits schemas for them too.
+
+=== Using the module
+
+Amend the generated module from `application.pkl`:
+
+.src/main/resources/application.pkl
+[source,pkl]
+----
+amends "Micronaut.pkl"
+
+micronaut {
+  application { name = "example" }
+  server {
+    port = 8080
+    netty { serverType = "FULL_CONTENT" }
+  }
+  executors {
+    ["io"] { type = "FIXED"; nThreads = 4 }
+  }
+}
+----
+
+A misspelled property (`prot`), a wrong type (`port = "8080"`), an unknown enum value or a violated constraint fails evaluation with Pkl's error message naming the file, line and column. The Pkl plugins for IntelliJ, VS Code and Neovim offer completion for the amended module's properties and show the Javadoc of the Micronaut class on hover.
+
+=== What is generated
+
+|===
+|Schema element |Pkl
+
+|`x-micronaut.prefix` such as `micronaut.server.netty`
+|A path of `open class` declarations: `MicronautConfig`, `MicronautServerConfig`, `MicronautServerNettyConfig`, each property holding the next level with a `new {}` default so it can be amended
+
+|`@EachProperty` schemas
+|`Mapping<String, MicronautExecutorsEntry>` (or a `Listing` for list containers)
+
+|`integer`, `number`, `boolean`, `string`
+|`Int?`, `Float?`, `Boolean?`, `String?`
+
+|`format: duration`
+|`Duration?`, written as `30.s`
+
+|`enum`
+|An inline union such as `("STREAMED" \| "FULL_CONTENT")?`
+
+|`array`, `object` without known properties
+|`Listing<T>?`, `Mapping<String, Any>?`
+
+|`minimum`, `maximum`, `pattern`, `minLength`, `minItems` and similar
+|Pkl type constraints such as `Int(isBetween(1, 65535))?`
+
+|`description`, `default`, `x-micronaut-javaType`
+|Doc comments shown on hover
+
+|`deprecated`
+|`@Deprecated`
+|===
+
+Every property is nullable and no defaults are assigned, so amending the schema sets only the values you write; an untouched property produces no configuration key. Property names are camelCase (`maxHeaderSize`), which Micronaut treats like `max-header-size`; names that are Pkl keywords are quoted with backticks, for example `` `default` ``.
+
+=== Limitations
+
+* Only prefixes that have a schema are known. A typed object rejects unknown properties, so keys for libraries without schemas or that are only read through `@Value` cannot be placed in an amending module. Declare them in a module that `extends` the generated one (every generated class and the module are `open`), or keep them in a second, untyped configuration file.
+* When an `@EachProperty` prefix such as `endpoints` also has schemas for named keys (`endpoints.health`), the prefix becomes a class whose named properties extend the entry type, so `endpoints.health.enabled` is known while a key without a schema (`endpoints.custom`) is not.
+* Properties that Micronaut reads as `@ReadableBytes` are not marked in the schemas yet and are generated as `Int`; write the byte count.
+* The generated file must be regenerated when dependencies change; commit it or generate it in the build before `processResources`.
