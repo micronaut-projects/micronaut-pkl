@@ -17,12 +17,14 @@ package io.micronaut.pkl.env;
 
 import io.micronaut.context.env.AbstractPropertySourceLoader;
 import io.micronaut.context.env.ActiveEnvironment;
+import io.micronaut.context.env.Environment;
 import io.micronaut.context.env.MapPropertySource;
 import io.micronaut.context.env.PropertySource;
 import io.micronaut.context.env.PropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.io.IOUtils;
 import io.micronaut.core.io.ResourceLoader;
+import io.micronaut.core.io.file.FileSystemResourceLoader;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
 import io.micronaut.core.order.Ordered;
 import io.micronaut.core.reflect.ClassUtils;
@@ -185,21 +187,18 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
             text = "amends \"" + baseName + "." + EXTENSION + "\"\n" + text;
         }
 
-        ClassLoader classLoader = resourceLoader instanceof ClassPathResourceLoader classPathResourceLoader
-            ? classPathResourceLoader.getClassLoader()
-            : PklPropertySourceLoader.class.getClassLoader();
+        ClassLoader classLoader = classLoaderOf(resourceLoader);
+        // Everything that is not an explicit file system location is a classpath resource: the Environment
+        // itself (which the DefaultEnvironment passes for the classpath:/ location), a ClassPathResourceLoader,
+        // or a GraalVM native image resource. Those resolve through the module path.
         ModuleSource source;
         Path rootDir = null;
-        String protocol = url.getProtocol();
-        if (resourceLoader instanceof ClassPathResourceLoader || "jar".equals(protocol) || "resource".equals(protocol)) {
-            // classpath resources, including GraalVM native image resources (resource:), resolve via the module path
-            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
-        } else if ("file".equals(protocol)) {
+        if (resourceLoader instanceof FileSystemResourceLoader) {
             Path file = toPath(url);
             rootDir = file.getParent();
             source = ModuleSource.create(file.toUri(), text);
         } else {
-            source = ModuleSource.text(text);
+            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
         }
 
         Map<String, Object> properties = evaluate(path, source, classLoader, rootDir, text);
@@ -306,6 +305,16 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
         } catch (IOException e) {
             throw new ConfigurationException("I/O exception occurred reading [" + path + "]: " + e.getMessage(), e);
         }
+    }
+
+    private static ClassLoader classLoaderOf(ResourceLoader resourceLoader) {
+        if (resourceLoader instanceof ClassPathResourceLoader classPathResourceLoader) {
+            return classPathResourceLoader.getClassLoader();
+        }
+        if (resourceLoader instanceof Environment environment) {
+            return environment.getClassLoader();
+        }
+        return PklPropertySourceLoader.class.getClassLoader();
     }
 
     private static Path toPath(URL url) {

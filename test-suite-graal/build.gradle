@@ -15,13 +15,20 @@ dependencies {
 }
 
 // pkl-core depends on the Truffle release it was built with; native-image refuses to build when that
-// polyglot version is older than the GraalVM doing the build, so align it with the GraalVM in use.
+// polyglot version differs from the GraalVM doing the build, so align it with the GraalVM in use. Every
+// GraalVM names its artifact version in its release file (GRAALVM_VERSION); fall back to the catalog.
+def graalHome = providers.environmentVariable('GRAALVM_HOME').orElse(providers.environmentVariable('JAVA_HOME'))
+def graalVersion = graalHome.map { home ->
+    def release = new File(home, 'release')
+    def line = release.isFile() ? release.readLines().find { it.startsWith('GRAALVM_VERSION=') } : null
+    line == null ? null : line.substring('GRAALVM_VERSION='.length()).replace('"', '')
+}.orElse(libs.versions.graal)
 // The image uses Truffle's fallback (interpreter-only) runtime, which is sufficient for evaluating
 // configuration at startup; adding org.graalvm.truffle:truffle-runtime would enable runtime compilation.
 configurations.configureEach {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group in ['org.graalvm.truffle', 'org.graalvm.polyglot', 'org.graalvm.sdk']) {
-            details.useVersion(libs.versions.graal.get())
+            details.useVersion(graalVersion.get())
             details.because('Truffle must match the GraalVM that builds the native image')
         }
     }
