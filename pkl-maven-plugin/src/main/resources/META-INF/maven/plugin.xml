@@ -1,0 +1,56 @@
+<plugin>
+  <name>Micronaut Pkl Maven Plugin</name>
+  <description>Generates a typed Pkl schema module from the Micronaut configuration schemas on the classpath.</description>
+  <groupId>io.micronaut.pkl</groupId>
+  <artifactId>micronaut-pkl-maven-plugin</artifactId>
+  <version>${project.version}</version>
+  <goalPrefix>micronaut-pkl</goalPrefix>
+  <mojos>
+    <mojo>
+      <goal>generate-pkl-schema</goal>
+      <description>Generates a Pkl schema module from the configuration JSON schemas on the project's runtime classpath.</description>
+      <requiresDependencyResolution>runtime</requiresDependencyResolution>
+      <implementation>io.micronaut.pkl.maven.GeneratePklSchemaMojo</implementation>
+      <language>java</language>
+      <phase>process-classes</phase>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <threadSafe>true</threadSafe>
+      <parameters>
+        <parameter>
+          <name>outputDirectory</name>
+          <type>java.io.File</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The directory the module is written to.</description>
+        </parameter>
+        <parameter>
+          <name>moduleName</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The name of the generated module, which is also its file name.</description>
+        </parameter>
+        <parameter>
+          <name>skip</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Skips the generation.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <outputDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}">${micronaut.pkl.outputDirectory}</outputDirectory>
+        <moduleName implementation="java.lang.String" default-value="Micronaut">${micronaut.pkl.moduleName}</moduleName>
+        <skip implementation="boolean" default-value="false">${micronaut.pkl.skip}</skip>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}" />
+      </configuration>
+    </mojo>
+  </mojos>
+</plugin>
