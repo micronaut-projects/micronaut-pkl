@@ -1,1 +1,3 @@
-TODO
+https://pkl-lang.org[Pkl] ("Pickle") is Apple's open-source configuration language. It is typed and object-oriented: modules can `amend` other modules, values can be derived from one another, properties can declare constraints that are validated when the module is evaluated, and durations and data sizes are first-class values.
+
+Using this module, the Micronaut framework loads configuration from `application.pkl` files alongside, or instead of, `application.yml`, `application.properties`, `application.json` and `application.toml`. Pkl's own evaluator (`pkl-core`) runs at startup to turn the module into the same flat key/value configuration every other format produces, so `@ConfigurationProperties`, `@Value` and `${...}` placeholders work unchanged.
