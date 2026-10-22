@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api mn.micronaut.core
+    api mn.micronaut.json.core
     implementation mn.micronaut.jackson.core
     testImplementation projects.micronautPkl
     testImplementation mn.micronaut.context

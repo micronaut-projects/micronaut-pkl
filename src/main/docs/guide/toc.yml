@@ -5,6 +5,7 @@ quickStart:
 environments: Environment-specific Modules
 valueTypes: Value Types
 schemaGenerator: Typed Configuration Schema
+buildPlugins: Gradle and Maven Plugins
 security: Sandboxing and Settings
 performance: Startup Cost
 repository: Repository
