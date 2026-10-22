@@ -110,6 +110,8 @@ class PklPropertySourceLoaderSpec extends Specification {
         expect:
         loader.enabled
         loader.extensions == ["pkl"] as Set
+        !loader.load("no-such-module", io.micronaut.core.io.scan.ClassPathResourceLoader.defaultLoader(getClass().classLoader)).present
+        !loader.load("no-such-module", new io.micronaut.core.io.file.DefaultFileSystemResourceLoader(java.nio.file.Path.of(".") )).present
     }
 
     void "the loader can be disabled via settings"() {
