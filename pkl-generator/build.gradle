@@ -1,0 +1,12 @@
+plugins {
+    id 'io.micronaut.build.internal.pkl-module'
+}
+
+dependencies {
+    api mn.micronaut.core
+    implementation mn.micronaut.jackson.core
+    testImplementation projects.micronautPkl
+    testImplementation mn.micronaut.context
+    testImplementation mn.micronaut.http.server.netty
+    testImplementation mn.micronaut.http.client
+}
