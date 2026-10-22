@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,28 +57,31 @@ public final class PklSchemaGeneratorCli {
      *             {@code --module-name <name>} (defaults to the file name without extension)
      * @throws IOException If the output cannot be written
      */
+    @SuppressWarnings("java:S106") // a command line tool reports on the console
     public static void main(String[] args) throws IOException {
         List<Path> classpath = new ArrayList<>();
         Path out = Path.of(PklSchemaGenerator.DEFAULT_MODULE_NAME + ".pkl");
         String moduleName = null;
-        for (int i = 0; i < args.length; i++) {
-            switch (args[i]) {
+        Iterator<String> arguments = List.of(args).iterator();
+        while (arguments.hasNext()) {
+            String argument = arguments.next();
+            switch (argument) {
                 case "--classpath", "-cp" -> {
-                    for (String entry : args[++i].split(File.pathSeparator)) {
+                    for (String entry : value(argument, arguments).split(File.pathSeparator)) {
                         if (!entry.isBlank()) {
                             classpath.add(Path.of(entry.trim()));
                         }
                     }
                 }
-                case "--out", "-o" -> out = Path.of(args[++i]);
-                case "--module-name", "-m" -> moduleName = args[++i];
+                case "--out", "-o" -> out = Path.of(value(argument, arguments));
+                case "--module-name", "-m" -> moduleName = value(argument, arguments);
                 case "--help", "-h" -> {
                     usage(System.out);
                     return;
                 }
                 default -> {
                     usage(System.err);
-                    throw new IllegalArgumentException("Unknown argument: " + args[i]);
+                    throw new IllegalArgumentException("Unknown argument: " + argument);
                 }
             }
         }
@@ -98,6 +102,15 @@ public final class PklSchemaGeneratorCli {
         System.out.println("Wrote " + out + " from " + schemas.size() + " configuration schemas");
     }
 
+    private static String value(String option, Iterator<String> arguments) {
+        if (!arguments.hasNext()) {
+            usage(System.err);
+            throw new IllegalArgumentException("Missing value for " + option);
+        }
+        return arguments.next();
+    }
+
+    @SuppressWarnings("java:S106") // a command line tool reports on the console
     private static void usage(PrintStream stream) {
         stream.println("Usage: PklSchemaGeneratorCli [--classpath <entries>] [--out <file>] [--module-name <name>]");
     }
