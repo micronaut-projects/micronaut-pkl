@@ -17,12 +17,14 @@ package io.micronaut.pkl.env;
 
 import io.micronaut.context.env.AbstractPropertySourceLoader;
 import io.micronaut.context.env.ActiveEnvironment;
+import io.micronaut.context.env.Environment;
 import io.micronaut.context.env.MapPropertySource;
 import io.micronaut.context.env.PropertySource;
 import io.micronaut.context.env.PropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.io.IOUtils;
 import io.micronaut.core.io.ResourceLoader;
+import io.micronaut.core.io.file.FileSystemResourceLoader;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
 import io.micronaut.core.order.Ordered;
 import io.micronaut.core.reflect.ClassUtils;
@@ -85,7 +87,6 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
      */
     public static final String EXTENSION = "pkl";
 
-    private static final Logger LOG = LoggerFactory.getLogger(PklPropertySourceLoader.class);
     private static final String PKL_EVALUATOR_CLASS = "org.pkl.core.Evaluator";
     private static final String INTERPRETER_WARNING_PROPERTY = "polyglot.engine.WarnInterpreterOnly";
     // a module header or an explicit amends/extends clause: the loader must not prepend its own clause
@@ -175,10 +176,10 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
         String path = fileName + "." + EXTENSION;
         Optional<URL> resource = resourceLoader.getResource(path);
         if (resource.isEmpty()) {
-            LOG.debug("No PropertySource found for file name: {}", path);
+            log().debug("No PropertySource found for file name: {}", path);
             return Optional.empty();
         }
-        LOG.debug("Found PropertySource for file name: {}", path);
+        log().debug("Found PropertySource for file name: {}", path);
         URL url = resource.get();
         String text = readText(resourceLoader, path);
         if (baseName != null && !MODULE_CLAUSE.matcher(text).find() && resourceLoader.getResource(baseName + "." + EXTENSION).isPresent()) {
@@ -186,19 +187,18 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
             text = "amends \"" + baseName + "." + EXTENSION + "\"\n" + text;
         }
 
-        ClassLoader classLoader = resourceLoader instanceof ClassPathResourceLoader classPathResourceLoader
-            ? classPathResourceLoader.getClassLoader()
-            : PklPropertySourceLoader.class.getClassLoader();
+        ClassLoader classLoader = classLoaderOf(resourceLoader);
+        // Everything that is not an explicit file system location is a classpath resource: the Environment
+        // itself (which the DefaultEnvironment passes for the classpath:/ location), a ClassPathResourceLoader,
+        // or a GraalVM native image resource. Those resolve through the module path.
         ModuleSource source;
         Path rootDir = null;
-        if (resourceLoader instanceof ClassPathResourceLoader) {
-            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
-        } else if ("file".equals(url.getProtocol())) {
+        if (resourceLoader instanceof FileSystemResourceLoader) {
             Path file = toPath(url);
             rootDir = file.getParent();
             source = ModuleSource.create(file.toUri(), text);
         } else {
-            source = ModuleSource.text(text);
+            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
         }
 
         Map<String, Object> properties = evaluate(path, source, classLoader, rootDir, text);
@@ -276,10 +276,20 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
         return builder;
     }
 
+    /**
+     * The logger is looked up on demand rather than held in a static field: GraalVM initialises this
+     * class at image build time, and a static logger would end up in the image heap.
+     *
+     * @return The logger
+     */
+    private static Logger log() {
+        return LoggerFactory.getLogger(PklPropertySourceLoader.class);
+    }
+
     private static void warnAboutDefaultElements(String name, String text) {
         Matcher matcher = DEFAULT_ELEMENT.matcher(text);
         if (matcher.find() && !matcher.group(1).isEmpty()) {
-            LOG.warn("Pkl module [{}] sets a `default` element. In Pkl `default` is a keyword that configures the "
+            log().warn("Pkl module [{}] sets a `default` element. In Pkl `default` is a keyword that configures the "
                 + "default value of an object's elements and is not a property named 'default'. For a Micronaut key "
                 + "such as datasources.default write it as an entry: datasources { [\"default\"] { ... } }", name);
         }
@@ -295,6 +305,16 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
         } catch (IOException e) {
             throw new ConfigurationException("I/O exception occurred reading [" + path + "]: " + e.getMessage(), e);
         }
+    }
+
+    private static ClassLoader classLoaderOf(ResourceLoader resourceLoader) {
+        if (resourceLoader instanceof ClassPathResourceLoader classPathResourceLoader) {
+            return classPathResourceLoader.getClassLoader();
+        }
+        if (resourceLoader instanceof Environment environment) {
+            return environment.getClassLoader();
+        }
+        return PklPropertySourceLoader.class.getClassLoader();
     }
 
     private static Path toPath(URL url) {

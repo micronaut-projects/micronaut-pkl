@@ -1,0 +1,12 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": "\\Qorg/pkl/core/stdlib/\\E.*\\.pkl"},
+      {"pattern": ".*\\.pkl"}
+    ]
+  },
+  "bundles": [
+    {"name": "org.pkl.core.errorMessages"},
+    {"name": "org.pkl.parser.errorMessages"}
+  ]
+}
