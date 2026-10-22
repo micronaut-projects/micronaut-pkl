@@ -3,7 +3,8 @@ The schema generator is easiest to use through the build plugins, which run it a
 .src/main/resources/application.pkl
 [source,pkl]
 ----
-amends "modulepath:/Micronaut.pkl"
+open module application
+extends "modulepath:/Micronaut.pkl"
 
 micronaut {
   application { name = "example" }

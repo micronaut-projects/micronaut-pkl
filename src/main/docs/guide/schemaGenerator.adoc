@@ -19,12 +19,13 @@ The same can be done programmatically with api:pkl.generator.SchemaLocator[] and
 
 === Using the module
 
-Amend the generated module from `application.pkl`:
+Derive `application.pkl` from the generated module. `extends` keeps the production module `open`, so environment and test modules can add keys (see the production and test configuration section); `amends` works too but then nothing can extend the production module:
 
 .src/main/resources/application.pkl
 [source,pkl]
 ----
-amends "Micronaut.pkl"
+open module application
+extends "modulepath:/Micronaut.pkl"
 
 micronaut {
   application { name = "example" }

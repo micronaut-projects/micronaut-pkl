@@ -17,7 +17,7 @@ Micronaut Pkl lets a Micronaut application be configured with [Apple Pkl](https:
 ## Design Rules
 
 - The loader implements `PropertySourceLoader` directly, not `AbstractPropertySourceLoader`, because the environment reads abstract loaders from an `InputStream` and the module's location is needed for relative `amends` and `import` clauses.
-- An environment module without an `amends`/`extends` clause implicitly amends `application.pkl`; keep that behaviour and its documentation in sync.
+- An environment module without a `module` header or `amends`/`extends` clause implicitly derives from `application.pkl`: `extends` when the base is `open module` (tests can add keys), `amends` otherwise. Keep that behaviour and the guide (environments, testing sections) in sync.
 - Evaluation is sandboxed by default (`pkl:`, `modulepath:` modules; `env:`, `prop:`, `modulepath:` resources; `file:` only below a file-system module's directory). Widening a default is a user-visible change and belongs in the guide.
 - Pkl `Duration` values become Micronaut's short string form (`30s`); `DataSize` values become whole bytes. Do not emit unit strings for data sizes: Pkl's `mb` is decimal while `@ReadableBytes` is binary.
 
