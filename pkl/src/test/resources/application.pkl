@@ -1,0 +1,38 @@
+micronaut {
+  application {
+    name = "pkl-test"
+  }
+  server {
+    port = 8081
+    readTimeout = 30.s
+    idleTimeout = 1.5.min
+    maxRequestSize = 10.mib
+  }
+}
+
+datasources {
+  ["default"] {
+    url = "jdbc:h2:mem:\(read?("env:PKL_TEST_DB") ?? "devDb")"
+    maximumPoolSize = 10
+  }
+}
+
+hibernate {
+  cache {
+    queries = false
+  }
+}
+
+placeholder = "${pkl.placeholder.value:fallback}"
+
+flags = new Listing { "a"; "b" }
+
+pairs = new Mapping {
+  ["one"] = 1
+  ["two"] = 2
+}
+
+/// Hidden members never reach the Environment.
+hidden secret = "do-not-expose"
+
+absent = null

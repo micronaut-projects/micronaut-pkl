@@ -1,0 +1,33 @@
+A Pkl module is a program. Following the https://pkl-lang.org/threat-model.html[Pkl threat model], the loader decides what a configuration module may import and read; the module itself cannot widen these permissions.
+
+By default a module may:
+
+* import modules from the Pkl standard library (`pkl:`) and from the classpath (`modulepath:`), so `amends "modulepath:/AppConfig.pkl"` works;
+* read `env:` environment variables, `prop:` system properties and `modulepath:` classpath resources;
+* when the module itself was loaded from the file system (for example from the working directory), import and read `file:` modules and resources below the module's own directory.
+
+Network access (`https:`), Pkl packages (`package:`) and arbitrary file access are disabled. They can be allowed with the following system properties, or the equivalent environment variables (`MICRONAUT_CONFIG_PKL_ALLOWED_MODULES`, and so on). These are read from system properties and environment variables only, because the loader runs before the `Environment` exists.
+
+|===
+|Setting |Description |Default
+
+|`micronaut.config.pkl.enabled`
+|Set to `false` to disable the loader.
+|`true`
+
+|`micronaut.config.pkl.timeout`
+|Maximum evaluation time per module, for example `500ms`, `30s` or `2m`. Pkl is Turing complete and does not bound CPU or memory, so the timeout is the only guard against a runaway module.
+|`10s`
+
+|`micronaut.config.pkl.allowed-modules`
+|Comma-separated regular expressions matched against the start of module URIs, added to the defaults. For example `https:,package:`.
+|
+
+|`micronaut.config.pkl.allowed-resources`
+|Comma-separated regular expressions matched against the start of resource URIs, added to the defaults. For example `https:`.
+|
+|===
+
+Evaluation errors, including security violations and timeouts, abort startup with a `ConfigurationException` that carries Pkl's own message, which names the module, line and column.
+
+To customise the evaluator further, for example to register a Pkl `ResourceReader` for a secrets store, subclass `PklPropertySourceLoader`, override `createEvaluator`, and register the subclass instead of the default in `META-INF/services/io.micronaut.context.env.PropertySourceLoader`.

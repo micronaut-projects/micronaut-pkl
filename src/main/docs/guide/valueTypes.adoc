@@ -1,0 +1,43 @@
+Pkl values are converted to the plain Java values a Micronaut `PropertySource` holds, after which Micronaut's `ConversionService` converts them to the types your configuration classes declare.
+
+|===
+|Pkl value |Property value |Notes
+
+|`String`, `Boolean`, `Int`, `Float`
+|`String`, `Boolean`, `Long`, `Double`
+|
+
+|`Duration` such as `30.s`, `5.min`, `1.5.h`
+|`String` in Micronaut's short form: `30s`, `5m`, `90m`
+|Fractional amounts are expressed in the next smaller unit. Inject as `java.time.Duration` or `String`.
+
+|`DataSize` such as `10.mb`, `10.mib`
+|`Long` number of bytes
+|Pkl `mb` is 1000-based and `mib` 1024-based; the byte count is exact either way, so `@ReadableBytes` is not needed.
+
+|`Listing` and `List`
+|`List`
+|
+
+|`Dynamic`, typed objects, `Mapping` and `Map`
+|Nested keys
+|Non-string mapping keys are converted with `toString()`.
+
+|`Pair`
+|`List` of two elements
+|
+
+|`null`
+|No value
+|
+
+|`hidden` members, `local` members
+|Not exported
+|Use them for intermediate values that should not appear in the `Environment`.
+
+|Classes, type aliases, regular expressions
+|`String`
+|
+|===
+
+Strings containing Micronaut placeholders such as `"${DB_HOST:localhost}"` are passed through untouched and resolved by the `Environment` after loading, so both Pkl's `read?("env:DB_HOST") ?? "localhost"` and Micronaut's placeholder syntax are available.
