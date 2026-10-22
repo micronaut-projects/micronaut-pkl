@@ -1,13 +1,13 @@
 <!-- Checklist: https://github.com/micronaut-projects/micronaut-core/wiki/New-Module-Checklist -->
 
-# Micronaut pkl
+# Micronaut Pkl
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.pkl/micronaut-project-template.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.project-template%22%20AND%20a:%22micronaut-project-template%22)
-[![Build Status](https://github.com/micronaut-projects/micronaut-pkl/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-project-template/actions)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=micronaut-projects_micronaut-template&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=micronaut-projects_micronaut-template)
+[![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.pkl/micronaut-pkl.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.pkl%22%20AND%20a:%22micronaut-pkl%22)
+[![Build Status](https://github.com/micronaut-projects/micronaut-pkl/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-pkl/actions)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=micronaut-projects_micronaut-pkl&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=micronaut-projects_micronaut-pkl)
 [![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
 
-Micronaut pkl
+Support for the [Apple Pkl](https://pkl-lang.org) configuration language in the Micronaut framework: write `application.pkl` instead of `application.yml`.
 
 ## Documentation
 

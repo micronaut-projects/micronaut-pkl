@@ -1,4 +1,11 @@
 plugins {
     id 'io.micronaut.build.internal.pkl-base'
-    id "io.micronaut.build.internal.module"
+    id 'io.micronaut.build.internal.module'
+}
+
+micronautBuild {
+    binaryCompatibility {
+        // No release exists yet; japicmp needs a baseline to compare against
+        enabledAfter '1.0.0'
+    }
 }

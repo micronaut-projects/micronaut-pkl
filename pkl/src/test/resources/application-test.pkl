@@ -1,0 +1,14 @@
+micronaut {
+  server {
+    port = 9090
+  }
+  application {
+    name = super.name + "-test"
+  }
+}
+
+hibernate {
+  cache {
+    queries = true
+  }
+}

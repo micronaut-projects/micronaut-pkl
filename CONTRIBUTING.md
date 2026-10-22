@@ -8,15 +8,15 @@ If you are interested in contributing to Micronaut and are looking for issues to
 
 ## JDK Setup
 
-Micronaut pkl currently requires JDK 25.
+Micronaut Pkl currently requires JDK 25.
 
 ## IDE Setup
 
-Micronaut pkl can be imported into IntelliJ IDEA by opening the `build.gradle` file.
+Micronaut Pkl can be imported into IntelliJ IDEA by opening the `build.gradle` file.
 
 ## Docker Setup
 
-Micronaut pkl tests currently require Docker to be installed.
+Micronaut Pkl tests currently require Docker to be installed.
 
 ## Running Tests
 
@@ -34,7 +34,7 @@ To also build the Javadocs, run `./gradlew docs`.
 
 If you use IntelliJ IDEA, you can import the project using the IntelliJ Gradle Tooling ("File / Import Project" and selecting the `settings.gradle` file).
 
-To get a local development version of Micronaut pkl working, first run the `publishToMavenLocal` task.
+To get a local development version of Micronaut Pkl working, first run the `publishToMavenLocal` task.
 
 ```
 ./gradlew pTML
@@ -77,7 +77,7 @@ When you merge a PR that will go into the next module's minor release:
 
 We want to keep the code clean, following good practices about organization, Javadoc, and style as much as possible.
 
-Micronaut pkl uses [Checkstyle](https://checkstyle.sourceforge.io/) to make sure that the code follows those standards. The configuration is defined in `config/checkstyle/checkstyle.xml`. To execute Checkstyle, run:
+Micronaut Pkl uses [Checkstyle](https://checkstyle.sourceforge.io/) to make sure that the code follows those standards. The configuration is defined in `config/checkstyle/checkstyle.xml`. To execute Checkstyle, run:
 
 ```
 ./gradlew <module-name>:checkstyleMain

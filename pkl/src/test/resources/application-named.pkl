@@ -1,0 +1,7 @@
+module example.Named
+
+micronaut {
+  server {
+    port = 6060
+  }
+}

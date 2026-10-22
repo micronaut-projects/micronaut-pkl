@@ -1,4 +1,0 @@
-plugins {
-    id 'io.micronaut.build.internal.pkl-base'
-    id "io.micronaut.build.internal.bom"
-}

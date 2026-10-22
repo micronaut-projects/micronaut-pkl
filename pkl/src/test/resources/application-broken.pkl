@@ -1,0 +1,5 @@
+micronaut {
+  server {
+    port = "not a port" + 
+  }
+}

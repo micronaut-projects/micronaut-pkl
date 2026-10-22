@@ -1,0 +1,9 @@
+plugins {
+    id 'io.micronaut.build.internal.pkl-module'
+}
+
+dependencies {
+    api mn.micronaut.inject
+    api libs.managed.pkl.core
+    testImplementation mn.micronaut.context
+}
