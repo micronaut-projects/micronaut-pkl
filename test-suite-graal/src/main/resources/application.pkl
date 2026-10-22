@@ -1,3 +1,8 @@
+/// Production configuration. Declared `open` so that environment-specific modules such as
+/// `application-test.pkl` in `src/test/resources` can extend it: override values, refer to them
+/// through `super`, and add keys the production module does not define.
+open module application
+
 micronaut {
   application { name = "pkl-graal" }
   server {

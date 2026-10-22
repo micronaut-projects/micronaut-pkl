@@ -46,13 +46,15 @@ class GreetingControllerTest {
 
     @Test
     void configurationIsLoadedFromPkl() {
-        // application-test.pkl implicitly amends application.pkl
+        // application-test.pkl in src/test/resources implicitly extends the open application.pkl in src/main/resources
         assertEquals("Hello from pkl-graal (test)", configuration.getMessage());
         assertEquals(5, configuration.getRetries());
         assertEquals(Duration.ofSeconds(90), configuration.getTimeout());
         assertEquals(List.of("native", "pkl"), configuration.getTags());
         assertEquals(Map.of("primary", "a", "secondary", "b"), configuration.getHosts());
         assertEquals("unset", configuration.getFromEnv());
+        // a key that only the test module defines, allowed because the production module is open
+        assertEquals(Boolean.TRUE, environment.getRequiredProperty("test-only.enabled", Boolean.class));
         assertEquals("pkl-graal", environment.getRequiredProperty("micronaut.application.name", String.class));
         assertEquals("30s", environment.getRequiredProperty("micronaut.server.idle-timeout", String.class));
         assertFalse(environment.containsProperty("micronaut.server.nothing"));

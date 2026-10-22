@@ -64,7 +64,9 @@ import java.util.regex.Pattern;
  * and exposes the result as configuration.
  *
  * <p>An environment-specific module that declares no {@code module} header and no {@code amends} or {@code extends}
- * clause implicitly amends the base module, so it only needs to state what differs.
+ * clause implicitly derives from the base module: it extends the base module when that is declared
+ * {@code open module}, and so may add properties, and amends it otherwise, and so may only override
+ * what the base declares. Either way it only needs to state what differs.
  * Evaluation runs in a sandbox: by default a module may import {@code pkl:} and
  * {@code modulepath:} modules and read {@code env:}, {@code prop:} and {@code modulepath:}
  * resources; a module loaded from the file system may also read files below its own
@@ -91,6 +93,7 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
     private static final String INTERPRETER_WARNING_PROPERTY = "polyglot.engine.WarnInterpreterOnly";
     // a module header or an explicit amends/extends clause: the loader must not prepend its own clause
     private static final Pattern MODULE_CLAUSE = Pattern.compile("(?m)^\\s*(?:(?:abstract|open)\\s+)*(?:module\\s|amends\\s+\"|extends\\s+\")");
+    private static final Pattern OPEN_MODULE = Pattern.compile("(?m)^\\s*open\\s+module\\b");
     private static final Pattern DEFAULT_ELEMENT = Pattern.compile("(?m)^(\\s*)default\\s*[{=]");
     private static final List<Pattern> DEFAULT_ALLOWED_MODULES = List.of(
         Pattern.compile("pkl:"),
@@ -181,27 +184,23 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
         }
         log().debug("Found PropertySource for file name: {}", path);
         URL url = resource.get();
-        String text = readText(resourceLoader, path);
-        if (baseName != null && !MODULE_CLAUSE.matcher(text).find() && resourceLoader.getResource(baseName + "." + EXTENSION).isPresent()) {
-            // Pkl-idiomatic environment files: amend the base module unless the file declares its own clause
-            text = "amends \"" + baseName + "." + EXTENSION + "\"\n" + text;
-        }
-
-        ClassLoader classLoader = classLoaderOf(resourceLoader);
         // Everything that is not an explicit file system location is a classpath resource: the Environment
         // itself (which the DefaultEnvironment passes for the classpath:/ location), a ClassPathResourceLoader,
         // or a GraalVM native image resource. Those resolve through the module path.
+        boolean modulePath = !(resourceLoader instanceof FileSystemResourceLoader);
+        String text = deriveFromBase(resourceLoader, readText(resourceLoader, path), baseName, modulePath);
+
         ModuleSource source;
         Path rootDir = null;
-        if (resourceLoader instanceof FileSystemResourceLoader) {
+        if (modulePath) {
+            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
+        } else {
             Path file = toPath(url);
             rootDir = file.getParent();
             source = ModuleSource.create(file.toUri(), text);
-        } else {
-            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
         }
 
-        Map<String, Object> properties = evaluate(path, source, classLoader, rootDir, text);
+        Map<String, Object> properties = evaluate(path, source, classLoaderOf(resourceLoader), rootDir, text);
         if (properties.isEmpty()) {
             return Optional.empty();
         }
@@ -217,6 +216,35 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
                 return origin;
             }
         });
+    }
+
+    /**
+     * Prepends the implicit clause that makes an environment module derive from its base module.
+     * Pkl-idiomatic environment files derive from the base module unless the file declares its own
+     * clause: an open base module is extended, so the environment file may add properties; any other
+     * base module is amended, so the environment file may only override what the base declares.
+     * On the classpath the base is addressed through the module path, because a relative URI would be
+     * resolved against the directory or JAR the environment module was found in (src/test/resources
+     * and src/main/resources are different entries).
+     *
+     * @param resourceLoader The resource loader
+     * @param text           The environment module text
+     * @param baseName       The base module name without extension, or {@code null} for the base module itself
+     * @param modulePath     Whether modules resolve through the module path
+     * @return The module text, with the clause when one applies
+     */
+    private static String deriveFromBase(ResourceLoader resourceLoader, String text, @Nullable String baseName, boolean modulePath) {
+        if (baseName == null || MODULE_CLAUSE.matcher(text).find()) {
+            return text;
+        }
+        String baseModule = baseName + "." + EXTENSION;
+        Optional<InputStream> base = resourceLoader.getResourceAsStream(baseModule);
+        if (base.isEmpty()) {
+            return text;
+        }
+        String clause = isOpenModule(readText(base.get(), baseModule)) ? "extends" : "amends";
+        String target = modulePath ? "modulepath:/" + baseModule : baseModule;
+        return clause + " \"" + target + "\"\n" + text;
     }
 
     private Map<String, Object> evaluate(String name, ModuleSource source, @Nullable ClassLoader classLoader, @Nullable Path rootDir, String text) {
@@ -295,12 +323,24 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
         }
     }
 
+    /**
+     * @param text The module text
+     * @return Whether the module is declared {@code open module}, and so can be extended
+     */
+    static boolean isOpenModule(String text) {
+        return OPEN_MODULE.matcher(text).find();
+    }
+
     private static String readText(ResourceLoader resourceLoader, String path) {
         Optional<InputStream> stream = resourceLoader.getResourceAsStream(path);
         if (stream.isEmpty()) {
             throw new ConfigurationException("Unable to read Pkl module [" + path + "]");
         }
-        try (InputStream input = stream.get()) {
+        return readText(stream.get(), path);
+    }
+
+    private static String readText(InputStream stream, String path) {
+        try (InputStream input = stream) {
             return IOUtils.readText(new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)));
         } catch (IOException e) {
             throw new ConfigurationException("I/O exception occurred reading [" + path + "]: " + e.getMessage(), e);
