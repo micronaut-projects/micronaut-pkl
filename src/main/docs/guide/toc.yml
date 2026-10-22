@@ -4,6 +4,7 @@ quickStart:
   title: Quick Start
 environments: Environment-specific Modules
 valueTypes: Value Types
+schemaGenerator: Typed Configuration Schema
 security: Sandboxing and Settings
 performance: Startup Cost
 repository: Repository

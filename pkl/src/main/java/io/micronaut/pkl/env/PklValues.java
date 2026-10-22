@@ -62,7 +62,8 @@ public final class PklValues {
 
     /**
      * Flattens nested maps into dotted property keys, in the same way the other Micronaut
-     * configuration loaders do: a non-empty map becomes a prefix, anything else a value.
+     * configuration loaders do: a map becomes a prefix and a non-null value a property. Null values and
+     * empty objects produce no keys, so an untouched property of a typed schema does not reach the Environment.
      *
      * @param nested The nested maps
      * @return The flattened properties
@@ -145,11 +146,11 @@ public final class PklValues {
 
     private static void flatten(Map<String, Object> flat, Map<String, Object> nested, String prefix) {
         nested.forEach((key, value) -> {
-            if (value instanceof Map<?, ?> map && !map.isEmpty()) {
+            if (value instanceof Map<?, ?> map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> child = (Map<String, Object>) map;
                 flatten(flat, child, prefix + key + '.');
-            } else {
+            } else if (value != null) {
                 flat.put(prefix + key, value);
             }
         });
