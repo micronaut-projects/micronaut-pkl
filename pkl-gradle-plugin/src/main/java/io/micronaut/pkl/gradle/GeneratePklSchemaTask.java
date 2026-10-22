@@ -34,7 +34,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -70,12 +69,7 @@ public abstract class GeneratePklSchemaTask extends DefaultTask {
      */
     @TaskAction
     public void generate() {
-        List<Path> entries = new ArrayList<>();
-        for (File file : getClasspath().getFiles()) {
-            if (file.exists()) {
-                entries.add(file.toPath());
-            }
-        }
+        List<Path> entries = getClasspath().getFiles().stream().filter(File::exists).map(File::toPath).toList();
         Map<String, JsonNode> schemas = SchemaLocator.fromPaths(entries);
         String moduleName = getModuleName().get();
         String pkl = PklSchemaGenerator.generate(schemas.values(), moduleName);
