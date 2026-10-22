@@ -24,7 +24,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -76,7 +76,7 @@ record PklLoaderSettings(
      * @param environment The environment variable lookup
      * @return The settings
      */
-    static PklLoaderSettings load(Function<String, @Nullable String> properties, Function<String, @Nullable String> environment) {
+    static PklLoaderSettings load(UnaryOperator<@Nullable String> properties, UnaryOperator<@Nullable String> environment) {
         return new PklLoaderSettings(
             !"false".equalsIgnoreCase(value("enabled", properties, environment)),
             parseTimeout(value("timeout", properties, environment)),
@@ -85,7 +85,7 @@ record PklLoaderSettings(
         );
     }
 
-    private static @Nullable String value(String name, Function<String, @Nullable String> properties, Function<String, @Nullable String> environment) {
+    private static @Nullable String value(String name, UnaryOperator<@Nullable String> properties, UnaryOperator<@Nullable String> environment) {
         String value = properties.apply(PREFIX + name);
         if (StringUtils.isEmpty(value)) {
             value = environment.apply((PREFIX + name).toUpperCase(Locale.ROOT).replace('.', '_').replace('-', '_'));

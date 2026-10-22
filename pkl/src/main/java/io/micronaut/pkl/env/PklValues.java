@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Converts the values of an evaluated Pkl module into the plain Java values a
@@ -91,11 +92,7 @@ public final class PklValues {
             return converted;
         }
         if (value instanceof Collection<?> collection) {
-            List<Object> converted = new ArrayList<>(collection.size());
-            for (Object element : collection) {
-                converted.add(toJava(element));
-            }
-            return converted;
+            return collection.stream().map(PklValues::toJava).collect(Collectors.toCollection(ArrayList::new));
         }
         if (value instanceof Pair<?, ?> pair) {
             List<Object> converted = new ArrayList<>(2);
