@@ -64,6 +64,11 @@ public final class PklSchemaGenerator {
     public static final String DEFAULT_MODULE_NAME = "Micronaut";
 
     private static final String INDENT = "  ";
+    private static final String DESCRIPTION = "description";
+    private static final String PROPERTIES = "properties";
+    private static final String OBJECT = "object";
+    private static final String ITEMS = "items";
+    private static final String SOURCE_TYPE = "x-micronaut-sourceType";
     private static final Pattern CODE_TAG = Pattern.compile("\\{@(?:code|literal) ([^}]*)}");
     private static final Pattern LINK_TAG = Pattern.compile("\\{@link(?:plain)? ([^}\\s]*)(?: ([^}]*))?}");
     private static final Pattern VALUE_TAG = Pattern.compile("\\{@value #?([^}]*)}");
@@ -121,10 +126,10 @@ public final class PklSchemaGenerator {
             JsonNode defs = schema.get("$defs");
             JsonNode entrySchema = defs != null ? defs.get("Entry") : null;
             if (entrySchema != null) {
-                apply(entry, entrySchema, string(schema, "description"), string(micronaut, "type"));
+                apply(entry, entrySchema, string(schema, DESCRIPTION), string(micronaut, "type"));
             }
         } else {
-            apply(node, schema, string(schema, "description"), string(micronaut, "type"));
+            apply(node, schema, string(schema, DESCRIPTION), string(micronaut, "type"));
         }
     }
 
@@ -146,31 +151,34 @@ public final class PklSchemaGenerator {
         if (sourceType != null) {
             node.sourceTypes.add(sourceType);
         }
-        JsonNode properties = objectSchema.get("properties");
+        JsonNode properties = objectSchema.get(PROPERTIES);
         if (properties == null || !properties.isObject()) {
             return;
         }
         for (Map.Entry<String, JsonNode> entry : properties.entries()) {
-            String name = entry.getKey();
-            JsonNode propertySchema = entry.getValue();
-            String type = string(propertySchema, "type");
-            JsonNode nested = propertySchema.get("properties");
-            if ("*".equals(name) || ("object".equals(type) && nested != null && nested.isObject())) {
-                // the schema writer inlines nested @EachProperty beans as a property named "*"
-                Node target = "*".equals(name) ? node.entry(false) : node.child(name);
-                apply(target, propertySchema, string(propertySchema, "description"), string(propertySchema, "x-micronaut-sourceType"));
-            } else if ("array".equals(type) && hasObjectItems(propertySchema)) {
-                Node entryNode = node.child(name).entry(true);
-                apply(entryNode, propertySchema.get("items"), string(propertySchema, "description"), string(propertySchema, "x-micronaut-sourceType"));
-            } else {
-                node.properties.putIfAbsent(name, propertySchema);
-            }
+            applyProperty(node, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void applyProperty(Node node, String name, JsonNode propertySchema) {
+        String type = string(propertySchema, "type");
+        JsonNode nested = propertySchema.get(PROPERTIES);
+        JsonNode items = propertySchema.get(ITEMS);
+        if ("*".equals(name) || (OBJECT.equals(type) && nested != null && nested.isObject())) {
+            // the schema writer inlines nested @EachProperty beans as a property named "*"
+            Node target = "*".equals(name) ? node.entry(false) : node.child(name);
+            apply(target, propertySchema, string(propertySchema, DESCRIPTION), string(propertySchema, SOURCE_TYPE));
+        } else if ("array".equals(type) && items != null && hasObjectItems(propertySchema)) {
+            Node entryNode = node.child(name).entry(true);
+            apply(entryNode, items, string(propertySchema, DESCRIPTION), string(propertySchema, SOURCE_TYPE));
+        } else {
+            node.properties.putIfAbsent(name, propertySchema);
         }
     }
 
     private static boolean hasObjectItems(JsonNode arraySchema) {
-        JsonNode items = arraySchema.get("items");
-        return items != null && items.isObject() && "object".equals(string(items, "type")) && items.get("properties") != null;
+        JsonNode items = arraySchema.get(ITEMS);
+        return items != null && items.isObject() && OBJECT.equals(string(items, "type")) && items.get(PROPERTIES) != null;
     }
 
     // ----- rendering -----
@@ -279,7 +287,7 @@ public final class PklSchemaGenerator {
 
     private void renderProperty(StringBuilder out, String name, JsonNode schema, String indent) {
         StringBuilder doc = new StringBuilder();
-        String description = cleanDoc(string(schema, "description"));
+        String description = cleanDoc(string(schema, DESCRIPTION));
         if (description != null) {
             doc.append(description);
         }
@@ -324,7 +332,7 @@ public final class PklSchemaGenerator {
             case "boolean" -> "Boolean";
             case "string" -> "duration".equals(format) ? "Duration" : constrained("String", stringConstraints(schema));
             case "array" -> constrained("Listing<" + itemType(schema) + ">", sizeConstraints(schema, "minItems", "maxItems"));
-            case "object" -> constrained("Mapping<String, " + additionalPropertiesType(schema) + ">", sizeConstraints(schema, "minProperties", "maxProperties"));
+            case OBJECT -> constrained("Mapping<String, " + additionalPropertiesType(schema) + ">", sizeConstraints(schema, "minProperties", "maxProperties"));
             default -> "Any";
         };
     }
@@ -339,7 +347,7 @@ public final class PklSchemaGenerator {
     }
 
     private static String itemType(JsonNode arraySchema) {
-        JsonNode items = arraySchema.get("items");
+        JsonNode items = arraySchema.get(ITEMS);
         if (items == null || !items.isObject()) {
             return "Any";
         }
@@ -455,7 +463,14 @@ public final class PklSchemaGenerator {
             String member = hash >= 0 ? target.substring(hash + 1) : null;
             String type = hash >= 0 ? target.substring(0, hash) : target;
             String simple = type.substring(type.lastIndexOf('.') + 1);
-            String ref = member == null ? simple : (simple.isEmpty() ? member : simple + "." + member);
+            String ref;
+            if (member == null) {
+                ref = simple;
+            } else if (simple.isEmpty()) {
+                ref = member;
+            } else {
+                ref = simple + "." + member;
+            }
             return "`" + ref + "`";
         });
         text = replace(VALUE_TAG, text, m -> "`" + m.group(1).trim() + "`");
