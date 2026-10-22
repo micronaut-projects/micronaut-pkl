@@ -102,6 +102,7 @@ public final class PklSchemaGeneratorCli {
         System.out.println("Wrote " + out + " from " + schemas.size() + " configuration schemas");
     }
 
+    @SuppressWarnings("java:S106") // a command line tool reports on the console
     private static String value(String option, Iterator<String> arguments) {
         if (!arguments.hasNext()) {
             usage(System.err);
