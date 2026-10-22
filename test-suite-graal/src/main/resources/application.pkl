@@ -1,0 +1,17 @@
+micronaut {
+  application { name = "pkl-graal" }
+  server {
+    port = -1
+    idleTimeout = 30.s
+    maxRequestSize = 10.mib
+  }
+}
+
+greeting {
+  message = "Hello from \(micronaut.application.name)"
+  retries = 3
+  timeout = 1.5.min
+  tags = new Listing { "native"; "pkl" }
+  hosts = new Mapping { ["primary"] = "a"; ["secondary"] = "b" }
+  fromEnv = read?("env:PKL_GRAAL_GREETING") ?? "unset"
+}
