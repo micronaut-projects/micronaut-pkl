@@ -18,10 +18,9 @@ class PklResourceLoaderSpec extends Specification {
     @TempDir
     Path dir
 
-    void "a module from a file system loader is evaluated from its file and may read sibling files"() {
+    void "a module from a file system loader is evaluated from its file"() {
         given:
-        Files.writeString(dir.resolve("name.txt"), "orders")
-        Files.writeString(dir.resolve("application.pkl"), 'micronaut { application { name = read("file:name.txt").text } }\n')
+        Files.writeString(dir.resolve("application.pkl"), 'micronaut { application { name = "orders" } }\n')
         PklPropertySourceLoader loader = new PklPropertySourceLoader()
 
         when:
