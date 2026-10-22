@@ -70,3 +70,19 @@ class PklValuesSpec extends Specification {
         map.re instanceof String
     }
 }
+
+class PklFlattenSpec extends Specification {
+
+    void "flatten drops null values and empty objects"() {
+        given:
+        Map<String, Object> nested = [
+                a: [b: 1L, c: null, d: [:], e: [f: [:], g: "x"]],
+                h: null,
+                i: [],
+                j: [k: "v"]
+        ]
+
+        expect:
+        PklValues.flatten(nested) == ["a.b": 1L, "a.e.g": "x", "i": [], "j.k": "v"]
+    }
+}
