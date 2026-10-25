@@ -5,6 +5,7 @@ Micronaut Pkl lets a Micronaut application be configured with [Apple Pkl](https:
 ## Repository Shape
 
 - `pkl/` is the `micronaut-pkl` module: `io.micronaut.pkl.env.PklPropertySourceLoader` (registered in `META-INF/services`), `PklValues` (Pkl value to property value conversion) and `PklLoaderSettings` (system property and environment variable settings read before the `Environment` exists).
+- `pkl-generator/` is `micronaut-pkl-generator`: `SchemaLocator` finds the JSON schemas Micronaut packages under `META-INF/micronaut-configuration-schemas`, `PklSchemaGenerator` turns them into a typed Pkl module (one `open class` per prefix, `Mapping` for `@EachProperty`, constraints and doc comments), `PklSchemaGeneratorCli` is the command line entry point.
 - `pkl-bom/` is the BOM. Keep dependency-management changes separate from module implementation changes when possible.
 - `buildSrc/src/main/groovy/io.micronaut.build.internal.pkl-*.gradle` holds the convention plugins.
 - `gradle/libs.versions.toml` pins the `org.pkl-lang` artifacts under `managed-pkl`; the module depends on the unshaded `pkl-core` so that the Truffle runtime is shared with other Truffle users on the classpath.
