@@ -1,0 +1,83 @@
+The schema generator is easiest to use through the build plugins, which run it against the application's runtime classpath (including the application's own `@ConfigurationProperties` classes, once compiled) and put the generated module on the classpath so `application.pkl` can amend it:
+
+.src/main/resources/application.pkl
+[source,pkl]
+----
+amends "modulepath:/Micronaut.pkl"
+
+micronaut {
+  application { name = "example" }
+}
+----
+
+=== Gradle
+
+Apply the `io.micronaut.pkl` plugin alongside the Java plugin:
+
+.build.gradle
+[source,groovy]
+----
+plugins {
+    id 'java'
+    id 'io.micronaut.pkl' version '{version}'
+}
+----
+
+The plugin is published to Maven Central with the other modules, so `pluginManagement { repositories { mavenCentral() } }` is needed in `settings.gradle` unless it is also on the Gradle plugin portal.
+
+The plugin adds the `generatePklSchema` task, which writes `build/generated/pkl/Micronaut.pkl` and adds that directory to the main resources, so the module is generated before `processResources` and packaged with the application. The task is cacheable and up to date while the runtime classpath does not change.
+
+The `micronautPkl` extension configures it:
+
+[source,groovy]
+----
+micronautPkl {
+    generateSchema = true                                        // set to false to disable the task
+    schemaModuleName = 'Micronaut'                               // the module and file name
+    schemaOutputDirectory = layout.projectDirectory.dir('src/main/pkl') // write into the source tree instead
+    schemaClasspath.from(configurations.runtimeClasspath)        // defaults to the runtime classpath and the main classes
+}
+----
+
+Writing the module into the source tree (and committing it) lets the Pkl IDE plugins resolve `amends "Micronaut.pkl"` with a relative path. With the default build directory, use the `modulepath:` form shown above, which the loader resolves on the classpath at run time.
+
+=== Maven
+
+Bind the `generate-pkl-schema` goal of `micronaut-pkl-maven-plugin`:
+
+.pom.xml
+[source,xml]
+----
+<plugin>
+  <groupId>io.micronaut.pkl</groupId>
+  <artifactId>micronaut-pkl-maven-plugin</artifactId>
+  <version>{version}</version>
+  <executions>
+    <execution>
+      <goals>
+        <goal>generate-pkl-schema</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+----
+
+The goal runs in the `process-classes` phase, after the project's own configuration classes have been compiled, and writes `Micronaut.pkl` into `target/classes` so that it is packaged. Parameters, each also settable as a system property:
+
+|===
+|Parameter |Property |Default
+
+|`outputDirectory`
+|`micronaut.pkl.outputDirectory`
+|`${project.build.outputDirectory}`
+
+|`moduleName`
+|`micronaut.pkl.moduleName`
+|`Micronaut`
+
+|`skip`
+|`micronaut.pkl.skip`
+|`false`
+|===
+
+Without a build plugin, the generator can also be run directly; see the previous section.

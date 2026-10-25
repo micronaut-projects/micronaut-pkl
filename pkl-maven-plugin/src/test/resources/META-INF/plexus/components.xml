@@ -1,0 +1,11 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.plugin.Mojo</role>
+      <role-hint>io.micronaut.pkl:micronaut-pkl-maven-plugin:${project.version}:generate-pkl-schema</role-hint>
+      <implementation>io.micronaut.pkl.maven.GeneratePklSchemaMojo</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <description>Test component descriptor for the generate-pkl-schema mojo.</description>
+    </component>
+  </components>
+</component-set>

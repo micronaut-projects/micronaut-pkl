@@ -14,6 +14,8 @@ rootProject.name = 'pkl-parent'
 include 'pkl'
 include 'pkl-bom'
 include 'pkl-generator'
+include 'pkl-gradle-plugin'
+include 'pkl-maven-plugin'
 include 'test-suite-graal'
 
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
