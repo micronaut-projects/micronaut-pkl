@@ -1,0 +1,7 @@
+amends "application.pkl"
+
+micronaut {
+  server {
+    port = 7070
+  }
+}

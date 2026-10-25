@@ -1,0 +1,5 @@
+datasources {
+  default {
+    url = "jdbc:h2:mem:lost"
+  }
+}

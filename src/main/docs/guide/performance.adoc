@@ -1,0 +1,9 @@
+Pkl's evaluator is a https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/[Truffle] interpreter. Initialising it the first time costs a few hundred milliseconds on a JVM and adds roughly 18 MB of JARs to the runtime classpath, most of it `truffle-api`. Once initialised, evaluating further modules takes about a millisecond, so the loader creates a fresh evaluator for every file without a measurable penalty.
+
+For most services the cost is acceptable. Where startup time matters, for example in serverless functions:
+
+* Keep configuration modules small and avoid expensive expressions; evaluation time is dominated by Truffle start-up, not by the module.
+* Run on a GraalVM JDK or as a GraalVM native image, where the interpreter starts faster.
+* Set `-Dpolyglot.engine.WarnInterpreterOnly=false` if you see Truffle's interpreter warning on other JDKs; the loader sets it when the property is unset.
+
+A build-time optimisation for https://micronaut-projects.github.io/micronaut-aot/latest/guide/[Micronaut AOT] that evaluates `.pkl` modules during the build and replaces them with a static property source, removing the evaluator from the deployed artifact, is planned.

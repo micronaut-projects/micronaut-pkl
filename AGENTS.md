@@ -1,38 +1,35 @@
 # Repository Guidance
 
-This repository is the Micronaut template for generated module repositories. Keep root guidance short and update it when the template workflow changes.
+Micronaut Pkl lets a Micronaut application be configured with [Apple Pkl](https://pkl-lang.org) modules. Keep this file short and update it when the repository layout changes.
 
 ## Repository Shape
 
-- `project-template/` is the generated module placeholder. Changes here should make sense after `template-cleanup.yml` renames it to `micronaut-<slug>/`.
-- `project-template-bom/` is the generated BOM placeholder. Keep dependency-management changes separate from module implementation changes when possible.
-- `buildSrc/src/main/groovy/io.micronaut.build.internal.project-template-*.gradle` contains template convention plugins that are also renamed by the cleanup workflow.
-- `.agents/skills/` is shared agent guidance. Skill changes are validated by `.github/workflows/skills-validation.yml`.
+- `pkl/` is the `micronaut-pkl` module: `io.micronaut.pkl.env.PklPropertySourceLoader` (registered in `META-INF/services`), `PklValues` (Pkl value to property value conversion) and `PklLoaderSettings` (system property and environment variable settings read before the `Environment` exists).
+- `pkl-bom/` is the BOM. Keep dependency-management changes separate from module implementation changes when possible.
+- `buildSrc/src/main/groovy/io.micronaut.build.internal.pkl-*.gradle` holds the convention plugins.
+- `gradle/libs.versions.toml` pins the `org.pkl-lang` artifacts under `managed-pkl`; the module depends on the unshaded `pkl-core` so that the Truffle runtime is shared with other Truffle users on the classpath.
+- `.agents/skills/` is shared agent guidance synced from micronaut-project-template.
 
-## Template And Sync Rules
+## Design Rules
 
-- Treat `.github/workflows/files-sync.yml` as the source of truth for files copied from this template to other Micronaut repositories.
-- Before editing synced files, check whether the file is copied by `files-sync.yml`, excluded by `.github/workflows/.rsync-filter`, or rewritten by `.github/workflows/template-cleanup.yml`.
-- `CONTRIBUTING.md` is rewritten by `template-cleanup.yml` when a repository is created from the template, but it is not copied by the recurring files-sync workflow. Existing downstream copies need repo-specific PRs.
-- Do not add project-specific assumptions to files that will be synced broadly unless the cleanup workflow rewrites them correctly for generated repositories.
-- When changing placeholder names, update every cleanup substitution and related file move in `.github/workflows/template-cleanup.yml`.
+- The loader implements `PropertySourceLoader` directly, not `AbstractPropertySourceLoader`, because the environment reads abstract loaders from an `InputStream` and the module's location is needed for relative `amends` and `import` clauses.
+- An environment module without an `amends`/`extends` clause implicitly amends `application.pkl`; keep that behaviour and its documentation in sync.
+- Evaluation is sandboxed by default (`pkl:`, `modulepath:` modules; `env:`, `prop:`, `modulepath:` resources; `file:` only below a file-system module's directory). Widening a default is a user-visible change and belongs in the guide.
+- Pkl `Duration` values become Micronaut's short string form (`30s`); `DataSize` values become whole bytes. Do not emit unit strings for data sizes: Pkl's `mb` is decimal while `@ReadableBytes` is binary.
 
 ## Contributing Guidelines
 
-- Before opening or updating a pull request, read this repository's `CONTRIBUTING.md` and follow every repo-specific PR requirement it names.
-- Treat contributor-checklist items as handoff requirements. If a requirement is not applicable, state that explicitly in the PR description or handoff note.
-- For UI-visible changes, confirm whether screenshots or other visual evidence are required and include them in the PR description; if screenshots cannot be provided, explain why and describe the verification that was performed.
+- Before opening or updating a pull request, read `CONTRIBUTING.md` and follow every repo-specific PR requirement it names.
+- Treat contributor-checklist items as handoff requirements. If a requirement is not applicable, state that explicitly in the PR description.
 
 ## Documentation
 
 - User guide sources live in `src/main/docs/guide`, with navigation in `src/main/docs/guide/toc.yml`.
 - Build guide output with `./gradlew publishGuide` or `./gradlew pG`; build guide plus Javadocs with `./gradlew docs`.
-- There are currently no `doc-examples/` snippets or shared docs images in this template. Prefer runnable snippets if examples are introduced.
 - Release-note behavior is maintained through `.github/release.yml`, `.github/workflows/release.yml`, and the release process documented in `MAINTAINING.md`.
 
 ## Verification
 
-- Use `./gradlew check` for general validation.
+- Use `./gradlew check` for general validation and `./gradlew :micronaut-pkl:test` for the module's Spock specs.
 - Use `./gradlew publishGuide` after guide or `toc.yml` changes.
 - Use `./gradlew docs` when API docs or release documentation output matters.
-- For `.agents/skills/**` changes, run the same validation as `skills-validation.yml` for the touched skill directories.

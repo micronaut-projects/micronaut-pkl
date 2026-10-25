@@ -1,1 +1,33 @@
-TODO
+To add support for Pkl to an existing project, add the Micronaut Pkl module to your build configuration:
+
+dependency:micronaut-pkl[groupId="io.micronaut.pkl"]
+
+You can then write your application configuration in Pkl:
+
+.src/main/resources/application.pkl
+[source,pkl]
+----
+micronaut {
+  application {
+    name = "example"
+  }
+  server {
+    port = 8080
+    readTimeout = 30.s
+    maxRequestSize = 10.mib
+  }
+}
+
+datasources {
+  ["default"] {
+    url = "jdbc:postgresql://\(read?("env:DB_HOST") ?? "localhost"):5432/app"
+    maximumPoolSize = 10
+  }
+}
+----
+
+Property names may be written in camelCase (`readTimeout`) or, between backticks, in kebab-case (`` `read-timeout` ``); both resolve to the same Micronaut property. Nested objects become dotted keys, so the module above defines `micronaut.server.port`, `datasources.default.url` and so on.
+
+TIP: `default` is a Pkl keyword that sets the default value of an object's elements, so `datasources { default { ... } }` does **not** define `datasources.default`. Write the entry form `["default"] { ... }` as shown above. The loader logs a warning when it finds a `default` element in a configuration module.
+
+A `.pkl` file can also be passed through `micronaut.config.files` or the `MICRONAUT_CONFIG_FILES` environment variable like any other configuration file. Modules loaded this way are evaluated from their text alone, so they cannot `amends` or `import` sibling files.

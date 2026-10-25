@@ -18,8 +18,7 @@
 [versions]
 micronaut = "5.2.2"
 # Managed versions appear in the BOM
-# managed-somelib = "1.0"
-# managed-somebom = "1.1"
+managed-pkl = "0.32.2"
 
 [libraries]
 # Core
@@ -28,7 +27,10 @@ micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'mi
 #
 # Managed dependencies appear in the BOM
 #
-# managed-somelib = { module = "group:artifact", version.ref = "managed-somelib" }
+managed-pkl-core = { module = "org.pkl-lang:pkl-core", version.ref = "managed-pkl" }
+managed-pkl-config-java = { module = "org.pkl-lang:pkl-config-java", version.ref = "managed-pkl" }
+managed-pkl-config-java-all = { module = "org.pkl-lang:pkl-config-java-all", version.ref = "managed-pkl" }
+managed-pkl-codegen-java = { module = "org.pkl-lang:pkl-codegen-java", version.ref = "managed-pkl" }
 
 #
 # Imported BOMs, also appearing in the generated BOM

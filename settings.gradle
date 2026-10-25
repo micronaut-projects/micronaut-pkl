@@ -9,13 +9,14 @@ plugins {
     id 'io.micronaut.build.shared.settings' version '8.0.1'
 }
 
-rootProject.name = 'project-template-parent'
+rootProject.name = 'pkl-parent'
 
-include 'project-template'
-include 'project-template-bom'
+include 'pkl'
+include 'pkl-bom'
 
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
 micronautBuild {
+    useStandardizedProjectNames = true
     importMicronautCatalog()
 }
