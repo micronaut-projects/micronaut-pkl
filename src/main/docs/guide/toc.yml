@@ -3,6 +3,7 @@ introduction:
 quickStart:
   title: Quick Start
 environments: Environment-specific Modules
+testing: Production and Test Configuration
 valueTypes: Value Types
 schemaGenerator: Typed Configuration Schema
 buildPlugins: Gradle and Maven Plugins

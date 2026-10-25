@@ -1,0 +1,11 @@
+// Loaded for the `test` environment and implicitly `extends "application.pkl"`, because the
+// production module is declared open. Overrides refer to production values through `super`;
+// `testOnly` is a key the production module does not define.
+greeting {
+  retries = super.retries + 2
+  message = super.message + " (test)"
+}
+
+testOnly {
+  enabled = true
+}

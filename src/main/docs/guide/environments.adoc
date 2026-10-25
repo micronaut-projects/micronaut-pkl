@@ -1,6 +1,6 @@
 As with the other formats, `application-{env}.pkl` is loaded for each active environment and ranks above `application.pkl`.
 
-Pkl's way of deriving one configuration from another is the `amends` clause. The Micronaut Pkl loader applies it for you: an environment module that does not declare its own `amends` or `extends` clause is evaluated as if it started with `amends "application.pkl"`, so it can refer to values of the base module and only has to state what differs.
+Pkl's way of deriving one module from another is an `amends` or `extends` clause. The Micronaut Pkl loader applies one for you: an environment module that declares no `module` header and no `amends` or `extends` clause is evaluated as if it started with a clause pointing at `modulepath:/application.pkl`, so it can refer to the production values through `super` and only has to state what differs. The clause is `extends` when `application.pkl` is declared `open module`, which lets the environment module add keys, and `amends` otherwise, which only lets it override existing ones.
 
 .src/main/resources/application-prod.pkl
 [source,pkl]
@@ -14,15 +14,15 @@ micronaut {
 datasources {
   ["default"] {
     url = "jdbc:postgresql://\(read("env:DB_HOST")):5432/app"
-    maximumPoolSize = 50
+    maximumPoolSize = super.maximumPoolSize * 2
   }
 }
 ----
 
-Because the environment module amends the base module, Pkl validates that every property it sets exists in the base module when the base module is typed. To add new properties in an environment module, declare them in `application.pkl` first (with `null` or a default value), or declare the module `open` in the base and use `extends`.
+If you prefer the merge-by-key behaviour of YAML, where each environment file is independent, start the environment module with a `module` declaration (for example `module prod`) or an explicit `amends` of a different module. The implicit clause is only added when the file has no module header and no `amends`/`extends` clause.
 
-If you prefer the merge-by-key behaviour of YAML, where each environment file is independent, start the environment module with a `module` declaration (for example `module example.Prod`) or an explicit `amends` of a different module. The implicit `amends` is only added when the file has no module header and no `amends`/`extends` clause.
+The section on production and test configuration describes the recommended layout across `src/main/resources` and `src/test/resources`.
 
-NOTE: The implicit clause is inserted as the first line of the module, so line numbers in Pkl error messages for an amended environment file are offset by one.
+NOTE: The implicit clause is inserted as the first line of the module, so line numbers in Pkl error messages for a derived environment file are offset by one.
 
 NOTE: Unlike the other configuration formats, duplicate `application.pkl` resources on the classpath are not detected or merged according to `micronaut.config.loading-strategy`; the first resource found is evaluated.

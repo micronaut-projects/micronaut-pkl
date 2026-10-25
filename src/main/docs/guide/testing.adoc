@@ -1,0 +1,108 @@
+A Micronaut application typically keeps its production configuration in `src/main/resources` and the configuration for tests in `src/test/resources`. With Pkl the recommended layout is:
+
+[source]
+----
+src/main/resources/application.pkl        <1>
+src/main/resources/application-prod.pkl   <2>
+src/test/resources/application-test.pkl   <3>
+----
+<1> The production module, declared `open module application`.
+<2> Optional environment-specific production modules; they derive from the production module automatically.
+<3> The test module, active for the `test` environment that `@MicronautTest` and `ApplicationContext.run()` enable by default; it derives from the production module automatically.
+
+=== The production module
+
+Declare the production module `open`, so that environment and test modules can extend it:
+
+.src/main/resources/application.pkl
+[source,pkl]
+----
+open module application
+
+micronaut {
+  application { name = "orders" }
+  server { port = 8080 }
+}
+
+datasources {
+  ["default"] {
+    url = "jdbc:postgresql://db:5432/orders"
+    maximumPoolSize = 20
+  }
+}
+----
+
+With the generated schema (see the previous sections), use `extends` rather than `amends` to attach it, because a module that amends another cannot itself be `open`:
+
+[source,pkl]
+----
+open module application
+extends "modulepath:/Micronaut.pkl"
+----
+
+Both forms validate every known property; `extends` additionally allows the module, and the modules deriving from it, to declare keys the schema does not know.
+
+=== The test module
+
+A module named `application-{env}.pkl` that has no `module` header and no `amends`/`extends` clause is loaded with an implicit clause pointing at `application.pkl`. The loader chooses the clause from the production module:
+
+|===
+|Production module |Implicit clause |The environment module may
+
+|`open module application` (recommended)
+|`extends "application.pkl"`
+|Override any value, refer to the production value through `super`, and add top-level keys that production does not define. Keys inside typed objects (from the schema) remain validated.
+
+|No header, or `amends "..."` (not open)
+|`amends "application.pkl"`
+|Override values and refer to them through `super`, and add keys only inside untyped (`Dynamic`) objects. A new top-level key fails with "Cannot find property".
+|===
+
+So a test module usually looks like this:
+
+.src/test/resources/application-test.pkl
+[source,pkl]
+----
+datasources {
+  ["default"] {
+    url = "jdbc:h2:mem:orders;DB_CLOSE_DELAY=-1"
+    maximumPoolSize = super.maximumPoolSize ~/ 4
+  }
+}
+
+micronaut {
+  server { port = -1 }
+}
+
+orders {
+  stubPayments = true   // a key only the tests use
+}
+----
+
+Because the test module derives from the production module, evaluating it yields the complete merged configuration, which the loader registers as its own property source above the production one. The usual precedence applies: values from `application-test.pkl` win over `application.pkl`, `@Property` and `@MicronautTest(propertySources = ...)` win over both, and environment variables and system properties win over all files, exactly as with YAML.
+
+=== Several environments
+
+Every `application-{env}.pkl` derives from `application.pkl`, not from the other environment modules. When several environments are active, for example `test` and `integration`, Micronaut layers their property sources in environment order, so later environments override earlier ones key by key, as with the other formats.
+
+=== Replacing instead of deriving
+
+To write an environment module that stands on its own, give it a `module` header or an explicit `amends`/`extends` clause. The loader then leaves it untouched and Micronaut merges it by key with the production module, which is the YAML behaviour:
+
+.src/test/resources/application-test.pkl
+[source,pkl]
+----
+module test
+
+micronaut { server { port = -1 } }
+----
+
+Such a module can still attach the schema on its own with `amends "modulepath:/Micronaut.pkl"`.
+
+=== Pitfalls
+
+* Do not put an `application.pkl` in `src/test/resources` to override production: both files share the resource name, the test classpath lists `src/test/resources` first, and the production module becomes unreachable, so nothing can derive from it. Use `application-test.pkl` instead.
+* When you write the clause yourself, address the production module through the module path, `extends "modulepath:/application.pkl"`, not with a relative name. Pkl resolves a relative name against the directory or JAR the current module was found in, and `src/test/resources` and `src/main/resources` are different classpath entries. The implicit clause already uses the module path form.
+* `super` refers to the production module's value at the same path; it is only available in a deriving module, not in a replacing one.
+* A production module that `amends` the schema cannot be `open`; switch it to `extends` if test modules need to add keys.
+* The implicit clause is inserted as the first line of the environment module, so Pkl line numbers in error messages for it are offset by one.
