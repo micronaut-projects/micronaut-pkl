@@ -7,3 +7,25 @@ For most services the cost is acceptable. Where startup time matters, for exampl
 * Set `-Dpolyglot.engine.WarnInterpreterOnly=false` if you see Truffle's interpreter warning on other JDKs; the loader sets it when the property is unset.
 
 A build-time optimisation for https://micronaut-projects.github.io/micronaut-aot/latest/guide/[Micronaut AOT] that evaluates `.pkl` modules during the build and replaces them with a static property source, removing the evaluator from the deployed artifact, is planned.
+
+=== GraalVM native image
+
+The loader works in a GraalVM native image. `micronaut-pkl` ships the native-image metadata that Pkl's evaluator needs, so no configuration is required in the application:
+
+* class-initialisation settings that initialise Pkl's generated Truffle node classes at image build time, as Truffle requires, while keeping the rest of `pkl-core` at run time (evaluating Pkl during the image build would capture the build's threads in the image heap);
+* resource settings that include the Pkl standard library modules and error-message bundles in the image.
+
+One build-time rule remains: `native-image` refuses to build when the `org.graalvm.polyglot` and `org.graalvm.truffle` artifacts on the classpath are older than the GraalVM performing the build (`Polyglot version compatibility check failed`). `pkl-core` depends on the Truffle release it was built with, so align those artifacts with your GraalVM version, for example in Gradle:
+
+[source,groovy]
+----
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group in ['org.graalvm.truffle', 'org.graalvm.polyglot', 'org.graalvm.sdk']) {
+            details.useVersion('25.4.4.1.1') // the version of the GraalVM you build with
+        }
+    }
+}
+----
+
+The image uses Truffle's interpreter-only fallback runtime, which is sufficient for evaluating configuration at startup. The repository's `test-suite-graal` module builds such an image and is run by the GraalVM CI workflows.
