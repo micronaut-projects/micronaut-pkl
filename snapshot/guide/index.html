@@ -1,0 +1,987 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Micronaut Pkl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <link rel="stylesheet" href="../css/highlight/agate.css">
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/guide.js"></script>
+    <script src="../js/multi-language-sample.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="../css/multi-language-sample.css"/>
+    <script src="../js/docs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+    <script type="text/javascript">
+        function addJsClass(el) {
+            var classes = document.body.className.split(" ");
+            classes.push("js");
+            document.body.className = classes.join(" ");
+        }
+    </script>
+    <style type="text/css">
+        .lang-java { display: block }; .lang-python { display: block }; .lang-kotlin { display: block }; .lang-groovy { display: block }; 
+    </style>
+</head>
+
+<body class="body" id="docs" onload="addJsClass();" onhashchange="highlightMenu()">
+
+<div id="table-of-content-nav-link" class="desktop">
+    <a id="theme-switcher" title="Switch to dark theme" href="javascript:switchTheme(true)"><i class="fa fa-moon-o"></i></a>
+    <a title="Collapse/Open Table of contents" title="Hide Table of Contents" href="javascript:hideTableOfContents();" class="button">[ + ]</a>
+</div>
+
+<div id="main">
+    <div id="navigation" class="no-print">
+        <div class="navTitle">
+            <span id="logo"><a href="http://micronaut.io" title="Go to Micronaut Website"><img src="../img/micronaut-logo-white.svg" alt="Micronaut"/></a></span>
+        </div>
+        <div class="navLinks">
+            <ul>
+                    <li><div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)" class="desktop">
+                            <a href="../guide/index.html" class="button">Table of contents</a>
+                            <div id="nav-summary-childs" style="display:none;">
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#quickStart"><strong>2</strong><span>Quick Start</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#environments"><strong>3</strong><span>Environment-specific Modules</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#testing"><strong>4</strong><span>Production and Test Configuration</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#valueTypes"><strong>5</strong><span>Value Types</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#schemaGenerator"><strong>6</strong><span>Typed Configuration Schema</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#buildPlugins"><strong>7</strong><span>Gradle and Maven Plugins</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#security"><strong>8</strong><span>Sandboxing and Settings</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#performance"><strong>9</strong><span>Startup Cost</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>10</strong><span>Repository</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#releaseHistory"><strong>11</strong><span>Release History</span></a></div>
+                                
+                            </div>
+                        </div>
+                    </li>
+
+                <li id="table-of-content-nav-link-mobile" class="mobile">
+                    <a title="Scroll to Table of contents" href="javascript:scrollToTop();" class="button">Toc</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to Configuration Reference documentation" href="../guide/configurationreference.html" class="button">Configuration Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to Configuration Reference documentation" href="../guide/configurationreference.html" class="button">Conf</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    
+    <div id="table-of-content">
+        <div class="toc-content">
+
+        <h2>Table of Contents</h2>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-introduction"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-quickStart"><a href="#quickStart"><strong>2</strong><span>Quick Start</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-environments"><a href="#environments"><strong>3</strong><span>Environment-specific Modules</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-testing"><a href="#testing"><strong>4</strong><span>Production and Test Configuration</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-valueTypes"><a href="#valueTypes"><strong>5</strong><span>Value Types</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemaGenerator"><a href="#schemaGenerator"><strong>6</strong><span>Typed Configuration Schema</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-buildPlugins"><a href="#buildPlugins"><strong>7</strong><span>Gradle and Maven Plugins</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-security"><a href="#security"><strong>8</strong><span>Sandboxing and Settings</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-performance"><a href="#performance"><strong>9</strong><span>Startup Cost</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>10</strong><span>Repository</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-releaseHistory"><a href="#releaseHistory"><strong>11</strong><span>Release History</span></a></div>
+        
+        </div>
+    </div>
+    
+    <div class="docs-content">
+    <div class="project">
+        <h1>Micronaut Pkl</h1>
+        <p></p>
+        <p>Support for the Apple Pkl configuration language in the Micronaut framework</p>
+        <p><strong>Version:</strong> 1.0.0-SNAPSHOT </p>
+    </div>
+    
+<h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/introduction.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="https://pkl-lang.org">Pkl</a> ("Pickle") is Apple&#8217;s open-source configuration language. It is typed and object-oriented: modules can <code>amend</code> other modules, values can be derived from one another, properties can declare constraints that are validated when the module is evaluated, and durations and data sizes are first-class values.</p>
+</div>
+<div class="paragraph">
+<p>Using this module, the Micronaut framework loads configuration from <code>application.pkl</code> files alongside, or instead of, <code>application.yml</code>, <code>application.properties</code>, <code>application.json</code> and <code>application.toml</code>. Pkl&#8217;s own evaluator (<code>pkl-core</code>) runs at startup to turn the module into the same flat key/value configuration every other format produces, so <code>@ConfigurationProperties</code>, <code>@Value</code> and <code>${&#8230;&#8203;}</code> placeholders work unchanged.</p>
+</div>
+
+<h1 id="quickStart"><a class="anchor" href="#quickStart"></a>2 Quick Start</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/quickStart.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To add support for Pkl to an existing project, add the Micronaut Pkl module to your build configuration:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.pkl:micronaut-pkl")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.pkl&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-pkl&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>You can then write your application configuration in Pkl:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">micronaut {
+  application {
+    name = "example"
+  }
+  server {
+    port = 8080
+    readTimeout = 30.s
+    maxRequestSize = 10.mib
+  }
+}
+
+datasources {
+  ["default"] {
+    url = "jdbc:postgresql://\(read?("env:DB_HOST") ?? "localhost"):5432/app"
+    maximumPoolSize = 10
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Property names may be written in camelCase (<code>readTimeout</code>) or, between backticks, in kebab-case (<code> <code>read-timeout</code> </code>); both resolve to the same Micronaut property. Nested objects become dotted keys, so the module above defines <code>micronaut.server.port</code>, <code>datasources.default.url</code> and so on.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>default</code> is a Pkl keyword that sets the default value of an object&#8217;s elements, so <code>datasources { default { &#8230;&#8203; } }</code> does <strong>not</strong> define <code>datasources.default</code>. Write the entry form <code>["default"] { &#8230;&#8203; }</code> as shown above. The loader logs a warning when it finds a <code>default</code> element in a configuration module.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>A <code>.pkl</code> file can also be passed through <code>micronaut.config.files</code> or the <code>MICRONAUT_CONFIG_FILES</code> environment variable like any other configuration file. Modules loaded this way are evaluated from their text alone, so they cannot <code>amends</code> or <code>import</code> sibling files.</p>
+</div>
+
+<h1 id="environments"><a class="anchor" href="#environments"></a>3 Environment-specific Modules</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/environments.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>As with the other formats, <code>application-{env}.pkl</code> is loaded for each active environment and ranks above <code>application.pkl</code>.</p>
+</div>
+<div class="paragraph">
+<p>Pkl&#8217;s way of deriving one module from another is an <code>amends</code> or <code>extends</code> clause. The Micronaut Pkl loader applies one for you: an environment module that declares no <code>module</code> header and no <code>amends</code> or <code>extends</code> clause is evaluated as if it started with a clause pointing at <code>modulepath:/application.pkl</code>, so it can refer to the production values through <code>super</code> and only has to state what differs. The clause is <code>extends</code> when <code>application.pkl</code> is declared <code>open module</code>, which lets the environment module add keys, and <code>amends</code> otherwise, which only lets it override existing ones.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application-prod.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">micronaut {
+  server {
+    port = 80
+  }
+}
+
+datasources {
+  ["default"] {
+    url = "jdbc:postgresql://\(read("env:DB_HOST")):5432/app"
+    maximumPoolSize = super.maximumPoolSize * 2
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you prefer the merge-by-key behaviour of YAML, where each environment file is independent, start the environment module with a <code>module</code> declaration (for example <code>module prod</code>) or an explicit <code>amends</code> of a different module. The implicit clause is only added when the file has no module header and no <code>amends</code>/<code>extends</code> clause.</p>
+</div>
+<div class="paragraph">
+<p>The section on production and test configuration describes the recommended layout across <code>src/main/resources</code> and <code>src/test/resources</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The implicit clause is inserted as the first line of the module, so line numbers in Pkl error messages for a derived environment file are offset by one.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Unlike the other configuration formats, duplicate <code>application.pkl</code> resources on the classpath are not detected or merged according to <code>micronaut.config.loading-strategy</code>; the first resource found is evaluated.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="testing"><a class="anchor" href="#testing"></a>4 Production and Test Configuration</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/testing.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>A Micronaut application typically keeps its production configuration in <code>src/main/resources</code> and the configuration for tests in <code>src/test/resources</code>. With Pkl the recommended layout is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">src/main/resources/application.pkl        <i class="conum" data-value="1"></i><b>(1)</b>
+src/main/resources/application-prod.pkl   <i class="conum" data-value="2"></i><b>(2)</b>
+src/test/resources/application-test.pkl   <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The production module, declared <code>open module application</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Optional environment-specific production modules; they derive from the production module automatically.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The test module, active for the <code>test</code> environment that <code>@MicronautTest</code> and <code>ApplicationContext.run()</code> enable by default; it derives from the production module automatically.</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_the_production_module">The production module</h3>
+<div class="paragraph">
+<p>Declare the production module <code>open</code>, so that environment and test modules can extend it:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">open module application
+
+micronaut {
+  application { name = "orders" }
+  server { port = 8080 }
+}
+
+datasources {
+  ["default"] {
+    url = "jdbc:postgresql://db:5432/orders"
+    maximumPoolSize = 20
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the generated schema (see the previous sections), use <code>extends</code> rather than <code>amends</code> to attach it, because a module that amends another cannot itself be <code>open</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">open module application
+extends "modulepath:/Micronaut.pkl"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both forms validate every known property; <code>extends</code> additionally allows the module, and the modules deriving from it, to declare keys the schema does not know.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_test_module">The test module</h3>
+<div class="paragraph">
+<p>A module named <code>application-{env}.pkl</code> that has no <code>module</code> header and no <code>amends</code>/<code>extends</code> clause is loaded with an implicit clause pointing at <code>application.pkl</code>. The loader chooses the clause from the production module:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Production module</th>
+<th class="tableblock halign-left valign-top">Implicit clause</th>
+<th class="tableblock halign-left valign-top">The environment module may</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>open module application</code> (recommended)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>extends "application.pkl"</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override any value, refer to the production value through <code>super</code>, and add top-level keys that production does not define. Keys inside typed objects (from the schema) remain validated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No header, or <code>amends "&#8230;&#8203;"</code> (not open)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>amends "application.pkl"</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override values and refer to them through <code>super</code>, and add keys only inside untyped (<code>Dynamic</code>) objects. A new top-level key fails with "Cannot find property".</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>So a test module usually looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">datasources {
+  ["default"] {
+    url = "jdbc:h2:mem:orders;DB_CLOSE_DELAY=-1"
+    maximumPoolSize = super.maximumPoolSize ~/ 4
+  }
+}
+
+micronaut {
+  server { port = -1 }
+}
+
+orders {
+  stubPayments = true   // a key only the tests use
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Because the test module derives from the production module, evaluating it yields the complete merged configuration, which the loader registers as its own property source above the production one. The usual precedence applies: values from <code>application-test.pkl</code> win over <code>application.pkl</code>, <code>@Property</code> and <code>@MicronautTest(propertySources = &#8230;&#8203;)</code> win over both, and environment variables and system properties win over all files, exactly as with YAML.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_several_environments">Several environments</h3>
+<div class="paragraph">
+<p>Every <code>application-{env}.pkl</code> derives from <code>application.pkl</code>, not from the other environment modules. When several environments are active, for example <code>test</code> and <code>integration</code>, Micronaut layers their property sources in environment order, so later environments override earlier ones key by key, as with the other formats.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_replacing_instead_of_deriving">Replacing instead of deriving</h3>
+<div class="paragraph">
+<p>To write an environment module that stands on its own, give it a <code>module</code> header or an explicit <code>amends</code>/<code>extends</code> clause. The loader then leaves it untouched and Micronaut merges it by key with the production module, which is the YAML behaviour:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/resources/application-test.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">module test
+
+micronaut { server { port = -1 } }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Such a module can still attach the schema on its own with <code>amends "modulepath:/Micronaut.pkl"</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pitfalls">Pitfalls</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Do not put an <code>application.pkl</code> in <code>src/test/resources</code> to override production: both files share the resource name, the test classpath lists <code>src/test/resources</code> first, and the production module becomes unreachable, so nothing can derive from it. Use <code>application-test.pkl</code> instead.</p>
+</li>
+<li>
+<p>When you write the clause yourself, address the production module through the module path, <code>extends "modulepath:/application.pkl"</code>, not with a relative name. Pkl resolves a relative name against the directory or JAR the current module was found in, and <code>src/test/resources</code> and <code>src/main/resources</code> are different classpath entries. The implicit clause already uses the module path form.</p>
+</li>
+<li>
+<p><code>super</code> refers to the production module&#8217;s value at the same path; it is only available in a deriving module, not in a replacing one.</p>
+</li>
+<li>
+<p>A production module that <code>amends</code> the schema cannot be <code>open</code>; switch it to <code>extends</code> if test modules need to add keys.</p>
+</li>
+<li>
+<p>The implicit clause is inserted as the first line of the environment module, so Pkl line numbers in error messages for it are offset by one.</p>
+</li>
+</ul>
+</div>
+</div>
+
+<h1 id="valueTypes"><a class="anchor" href="#valueTypes"></a>5 Value Types</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/valueTypes.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Pkl values are converted to the plain Java values a Micronaut <code>PropertySource</code> holds, after which Micronaut&#8217;s <code>ConversionService</code> converts them to the types your configuration classes declare.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Pkl value</th>
+<th class="tableblock halign-left valign-top">Property value</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code>, <code>Boolean</code>, <code>Int</code>, <code>Float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code>, <code>Boolean</code>, <code>Long</code>, <code>Double</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Duration</code> such as <code>30.s</code>, <code>5.min</code>, <code>1.5.h</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code> in Micronaut&#8217;s short form: <code>30s</code>, <code>5m</code>, <code>90m</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fractional amounts are expressed in the next smaller unit. Inject as <code>java.time.Duration</code> or <code>String</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DataSize</code> such as <code>10.mb</code>, <code>10.mib</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Long</code> number of bytes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pkl <code>mb</code> is 1000-based and <code>mib</code> 1024-based; the byte count is exact either way, so <code>@ReadableBytes</code> is not needed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Listing</code> and <code>List</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>List</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Dynamic</code>, typed objects, <code>Mapping</code> and <code>Map</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nested keys</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-string mapping keys are converted with <code>toString()</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Pair</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>List</code> of two elements</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No value</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hidden</code> members, <code>local</code> members</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not exported</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use them for intermediate values that should not appear in the <code>Environment</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Classes, type aliases, regular expressions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Strings containing Micronaut placeholders such as <code>"${DB_HOST:localhost}"</code> are passed through untouched and resolved by the <code>Environment</code> after loading, so both Pkl&#8217;s <code>read?("env:DB_HOST") ?? "localhost"</code> and Micronaut&#8217;s placeholder syntax are available.</p>
+</div>
+
+<h1 id="schemaGenerator"><a class="anchor" href="#schemaGenerator"></a>6 Typed Configuration Schema</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/schemaGenerator.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Pkl&#8217;s main advantage over YAML is validation: a module that amends a typed schema is checked for unknown properties, wrong types and out-of-range values when it is evaluated, and the Pkl IDE plugins use the same schema for completion and hover documentation.</p>
+</div>
+<div class="paragraph">
+<p>Micronaut already ships the information needed for such a schema: every module packages one JSON Schema per <code>@ConfigurationProperties</code> and <code>@EachProperty</code> class under <code>META-INF/micronaut-configuration-schemas/</code>. The <code>micronaut-pkl-generator</code> module turns the schemas found on an application&#8217;s classpath into a single Pkl module, so the schema reflects exactly the modules the application depends on, at their exact versions.</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">runtimeOnly(<span class="hljs-string">"io.micronaut.pkl:micronaut-pkl-generator")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.pkl&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-pkl-generator&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="sect2">
+<h3 id="_generating_the_module">Generating the module</h3>
+<div class="paragraph">
+<p>The Gradle and Maven plugins described in the next section run the generator as part of the build. To run it by hand, use the command line entry point with the application&#8217;s runtime classpath:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -cp micronaut-pkl-generator.jar:... io.micronaut.pkl.generator.PklSchemaGeneratorCli \
+    --classpath build/classes/java/main:lib/micronaut-http-server-netty-5.2.2.jar \
+    --out src/main/resources/Micronaut.pkl</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The same can be done programmatically with <a href="../api/io/micronaut/pkl/generator/SchemaLocator.html">SchemaLocator</a> and <a href="../api/io/micronaut/pkl/generator/PklSchemaGenerator.html">PklSchemaGenerator</a>. The application&#8217;s own <code>@ConfigurationProperties</code> classes are included when the application&#8217;s class output is on the classpath, because the Micronaut annotation processor emits schemas for them too.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_the_module">Using the module</h3>
+<div class="paragraph">
+<p>Derive <code>application.pkl</code> from the generated module. <code>extends</code> keeps the production module <code>open</code>, so environment and test modules can add keys (see the production and test configuration section); <code>amends</code> works too but then nothing can extend the production module:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">open module application
+extends "modulepath:/Micronaut.pkl"
+
+micronaut {
+  application { name = "example" }
+  server {
+    port = 8080
+    netty { serverType = "FULL_CONTENT" }
+  }
+  executors {
+    ["io"] { type = "FIXED"; nThreads = 4 }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A misspelled property (<code>prot</code>), a wrong type (<code>port = "8080"</code>), an unknown enum value or a violated constraint fails evaluation with Pkl&#8217;s error message naming the file, line and column. The Pkl plugins for IntelliJ, VS Code and Neovim offer completion for the amended module&#8217;s properties and show the Javadoc of the Micronaut class on hover.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_what_is_generated">What is generated</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Schema element</th>
+<th class="tableblock halign-left valign-top">Pkl</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x-micronaut.prefix</code> such as <code>micronaut.server.netty</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A path of <code>open class</code> declarations: <code>MicronautConfig</code>, <code>MicronautServerConfig</code>, <code>MicronautServerNettyConfig</code>, each property holding the next level with a <code>new {}</code> default so it can be amended</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@EachProperty</code> schemas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Mapping&lt;String, MicronautExecutorsEntry&gt;</code> (or a <code>Listing</code> for list containers)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>integer</code>, <code>number</code>, <code>boolean</code>, <code>string</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Int?</code>, <code>Float?</code>, <code>Boolean?</code>, <code>String?</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>format: duration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Duration?</code>, written as <code>30.s</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>enum</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An inline union such as <code>("STREAMED" | "FULL_CONTENT")?</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>array</code>, <code>object</code> without known properties</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Listing&lt;T&gt;?</code>, <code>Mapping&lt;String, Any&gt;?</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>minimum</code>, <code>maximum</code>, <code>pattern</code>, <code>minLength</code>, <code>minItems</code> and similar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pkl type constraints such as <code>Int(isBetween(1, 65535))?</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code>, <code>default</code>, <code>x-micronaut-javaType</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Doc comments shown on hover</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>deprecated</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Deprecated</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Every property is nullable and no defaults are assigned, so amending the schema sets only the values you write; an untouched property produces no configuration key. Property names are camelCase (<code>maxHeaderSize</code>), which Micronaut treats like <code>max-header-size</code>; names that are Pkl keywords are quoted with backticks, for example <code> <code>default</code> </code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_limitations">Limitations</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Only prefixes that have a schema are known. A typed object rejects unknown properties, so keys for libraries without schemas or that are only read through <code>@Value</code> cannot be placed in an amending module. Declare them in a module that <code>extends</code> the generated one (every generated class and the module are <code>open</code>), or keep them in a second, untyped configuration file.</p>
+</li>
+<li>
+<p>When an <code>@EachProperty</code> prefix such as <code>endpoints</code> also has schemas for named keys (<code>endpoints.health</code>), the prefix becomes a class whose named properties extend the entry type, so <code>endpoints.health.enabled</code> is known while a key without a schema (<code>endpoints.custom</code>) is not.</p>
+</li>
+<li>
+<p>Properties that Micronaut reads as <code>@ReadableBytes</code> are not marked in the schemas yet and are generated as <code>Int</code>; write the byte count.</p>
+</li>
+<li>
+<p>The generated file must be regenerated when dependencies change; commit it or generate it in the build before <code>processResources</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+
+<h1 id="buildPlugins"><a class="anchor" href="#buildPlugins"></a>7 Gradle and Maven Plugins</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/buildPlugins.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The schema generator is easiest to use through the build plugins, which run it against the application&#8217;s runtime classpath (including the application&#8217;s own <code>@ConfigurationProperties</code> classes, once compiled) and put the generated module on the classpath so <code>application.pkl</code> can amend it:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.pkl</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-pkl hljs" data-lang="pkl">open module application
+extends "modulepath:/Micronaut.pkl"
+
+micronaut {
+  application { name = "example" }
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gradle">Gradle</h3>
+<div class="paragraph">
+<p>Apply the <code>io.micronaut.pkl</code> plugin alongside the Java plugin:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">plugins {
+    id 'java'
+    id 'io.micronaut.pkl' version '{version}'
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The plugin is published to Maven Central with the other modules, so <code>pluginManagement { repositories { mavenCentral() } }</code> is needed in <code>settings.gradle</code> unless it is also on the Gradle plugin portal.</p>
+</div>
+<div class="paragraph">
+<p>The plugin adds the <code>generatePklSchema</code> task, which writes <code>build/generated/pkl/Micronaut.pkl</code> and adds that directory to the main resources, so the module is generated before <code>processResources</code> and packaged with the application. The task is cacheable and up to date while the runtime classpath does not change.</p>
+</div>
+<div class="paragraph">
+<p>The <code>micronautPkl</code> extension configures it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">micronautPkl {
+    generateSchema = true                                        // set to false to disable the task
+    schemaModuleName = 'Micronaut'                               // the module and file name
+    schemaOutputDirectory = layout.projectDirectory.dir('src/main/pkl') // write into the source tree instead
+    schemaClasspath.from(configurations.runtimeClasspath)        // defaults to the runtime classpath and the main classes
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Writing the module into the source tree (and committing it) lets the Pkl IDE plugins resolve <code>amends "Micronaut.pkl"</code> with a relative path. With the default build directory, use the <code>modulepath:</code> form shown above, which the loader resolves on the classpath at run time.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maven">Maven</h3>
+<div class="paragraph">
+<p>Bind the <code>generate-pkl-schema</code> goal of <code>micronaut-pkl-maven-plugin</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+  &lt;groupId&gt;io.micronaut.pkl&lt;/groupId&gt;
+  &lt;artifactId&gt;micronaut-pkl-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;{version}&lt;/version&gt;
+  &lt;executions&gt;
+    &lt;execution&gt;
+      &lt;goals&gt;
+        &lt;goal&gt;generate-pkl-schema&lt;/goal&gt;
+      &lt;/goals&gt;
+    &lt;/execution&gt;
+  &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The goal runs in the <code>process-classes</code> phase, after the project&#8217;s own configuration classes have been compiled, and writes <code>Micronaut.pkl</code> into <code>target/classes</code> so that it is packaged. Parameters, each also settable as a system property:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>outputDirectory</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.pkl.outputDirectory</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${project.build.outputDirectory}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>moduleName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.pkl.moduleName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Micronaut</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>skip</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.pkl.skip</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Without a build plugin, the generator can also be run directly; see the previous section.</p>
+</div>
+</div>
+
+<h1 id="security"><a class="anchor" href="#security"></a>8 Sandboxing and Settings</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/security.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>A Pkl module is a program. Following the <a href="https://pkl-lang.org/threat-model.html">Pkl threat model</a>, the loader decides what a configuration module may import and read; the module itself cannot widen these permissions.</p>
+</div>
+<div class="paragraph">
+<p>By default a module may:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>import modules from the Pkl standard library (<code>pkl:</code>) and from the classpath (<code>modulepath:</code>), so <code>amends "modulepath:/AppConfig.pkl"</code> works;</p>
+</li>
+<li>
+<p>read <code>env:</code> environment variables, <code>prop:</code> system properties and <code>modulepath:</code> classpath resources;</p>
+</li>
+<li>
+<p>when the module itself was loaded from the file system (for example from the working directory), import and read <code>file:</code> modules and resources below the module&#8217;s own directory.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Network access (<code>https:</code>), Pkl packages (<code>package:</code>) and arbitrary file access are disabled. They can be allowed with the following system properties, or the equivalent environment variables (<code>MICRONAUT_CONFIG_PKL_ALLOWED_MODULES</code>, and so on). These are read from system properties and environment variables only, because the loader runs before the <code>Environment</code> exists.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Setting</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.config.pkl.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set to <code>false</code> to disable the loader.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.config.pkl.timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum evaluation time per module, for example <code>500ms</code>, <code>30s</code> or <code>2m</code>. Pkl is Turing complete and does not bound CPU or memory, so the timeout is the only guard against a runaway module.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10s</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.config.pkl.allowed-modules</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated regular expressions matched against the start of module URIs, added to the defaults. For example <code>https:,package:</code>.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.config.pkl.allowed-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma-separated regular expressions matched against the start of resource URIs, added to the defaults. For example <code>https:</code>.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Evaluation errors, including security violations and timeouts, abort startup with a <code>ConfigurationException</code> that carries Pkl&#8217;s own message, which names the module, line and column.</p>
+</div>
+<div class="paragraph">
+<p>To customise the evaluator further, for example to register a Pkl <code>ResourceReader</code> for a secrets store, subclass <code>PklPropertySourceLoader</code>, override <code>createEvaluator</code>, and register the subclass instead of the default in <code>META-INF/services/io.micronaut.context.env.PropertySourceLoader</code>.</p>
+</div>
+
+<h1 id="performance"><a class="anchor" href="#performance"></a>9 Startup Cost</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/performance.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Pkl&#8217;s evaluator is a <a href="https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/">Truffle</a> interpreter. Initialising it the first time costs a few hundred milliseconds on a JVM and adds roughly 18 MB of JARs to the runtime classpath, most of it <code>truffle-api</code>. Once initialised, evaluating further modules takes about a millisecond, so the loader creates a fresh evaluator for every file without a measurable penalty.</p>
+</div>
+<div class="paragraph">
+<p>For most services the cost is acceptable. Where startup time matters, for example in serverless functions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Keep configuration modules small and avoid expensive expressions; evaluation time is dominated by Truffle start-up, not by the module.</p>
+</li>
+<li>
+<p>Run on a GraalVM JDK or as a GraalVM native image, where the interpreter starts faster.</p>
+</li>
+<li>
+<p>Set <code>-Dpolyglot.engine.WarnInterpreterOnly=false</code> if you see Truffle&#8217;s interpreter warning on other JDKs; the loader sets it when the property is unset.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A build-time optimisation for <a href="https://micronaut-projects.github.io/micronaut-aot/latest/guide/">Micronaut AOT</a> that evaluates <code>.pkl</code> modules during the build and replaces them with a static property source, removing the evaluator from the deployed artifact, is planned.</p>
+</div>
+<div class="sect2">
+<h3 id="_graalvm_native_image">GraalVM native image</h3>
+<div class="paragraph">
+<p>The loader works in a GraalVM native image. <code>micronaut-pkl</code> ships the native-image metadata that Pkl&#8217;s evaluator needs, so no configuration is required in the application:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>class-initialisation settings that initialise Pkl&#8217;s generated Truffle node classes at image build time, as Truffle requires, while keeping the rest of <code>pkl-core</code> at run time (evaluating Pkl during the image build would capture the build&#8217;s threads in the image heap);</p>
+</li>
+<li>
+<p>resource settings that include the Pkl standard library modules and error-message bundles in the image.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>One build-time rule remains: <code>native-image</code> refuses to build when the <code>org.graalvm.polyglot</code> and <code>org.graalvm.truffle</code> artifacts on the classpath are older than the GraalVM performing the build (<code>Polyglot version compatibility check failed</code>). <code>pkl-core</code> depends on the Truffle release it was built with, so align those artifacts with your GraalVM version, for example in Gradle:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">configurations.configureEach {
+    resolutionStrategy.eachDependency { details -&gt;
+        if (details.requested.group in ['org.graalvm.truffle', 'org.graalvm.polyglot', 'org.graalvm.sdk']) {
+            details.useVersion('25.4.4.1.1') // the version of the GraalVM you build with
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The image uses Truffle&#8217;s interpreter-only fallback runtime, which is sufficient for evaluating configuration at startup. The repository&#8217;s <code>test-suite-graal</code> module builds such an image and is run by the GraalVM CI workflows.</p>
+</div>
+</div>
+
+<h1 id="repository"><a class="anchor" href="#repository"></a>10 Repository</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/repository.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can find the source code of this project in this repository:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/micronaut-projects/micronaut-pkl">https://github.com/micronaut-projects/micronaut-pkl</a></p>
+</div>
+
+<h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>11 Release History</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-pkl/edit/master/src/main/docs/guide/releaseHistory.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>For this project, you can find a list of releases (with release notes) here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/micronaut-projects/micronaut-pkl/releases">https://github.com/micronaut-projects/micronaut-pkl/releases</a></p>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

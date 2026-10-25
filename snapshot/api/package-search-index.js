@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"io.micronaut.pkl.env"},{"l":"io.micronaut.pkl.generator"},{"l":"io.micronaut.pkl.gradle"},{"l":"io.micronaut.pkl.info"},{"l":"io.micronaut.pkl.maven"}];updateSearchResults();

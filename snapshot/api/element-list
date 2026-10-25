@@ -1,0 +1,5 @@
+io.micronaut.pkl.env
+io.micronaut.pkl.generator
+io.micronaut.pkl.gradle
+io.micronaut.pkl.info
+io.micronaut.pkl.maven
