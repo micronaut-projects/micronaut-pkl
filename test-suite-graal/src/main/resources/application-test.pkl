@@ -1,0 +1,4 @@
+greeting {
+  retries = 5
+  message = super.message + " (test)"
+}
