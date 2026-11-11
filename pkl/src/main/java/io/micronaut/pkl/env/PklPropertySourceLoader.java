@@ -26,6 +26,7 @@ import io.micronaut.core.io.IOUtils;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.io.file.FileSystemResourceLoader;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
+import io.micronaut.core.optim.StaticOptimizations;
 import io.micronaut.core.order.Ordered;
 import io.micronaut.core.reflect.ClassUtils;
 import org.jspecify.annotations.Nullable;
@@ -51,6 +52,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,6 +76,9 @@ import java.util.regex.Pattern;
  * and {@code micronaut.config.pkl.allowed-resources} system properties (or the equivalent
  * {@code MICRONAUT_CONFIG_PKL_*} environment variables), and evaluation is bounded by
  * {@code micronaut.config.pkl.timeout} (10 seconds by default).</p>
+ *
+ * <p>A classpath module that the {@code pkl.to.java.config} Micronaut AOT optimization evaluated when the
+ * application was built (see {@link PklStaticModules}) is served from its precomputed properties instead.</p>
  *
  * <p>This loader deliberately does not extend {@link AbstractPropertySourceLoader}: the
  * environment reads such loaders from an {@link InputStream}, which would hide the module's
@@ -108,13 +113,14 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
     private static final Pattern FILE_PATTERN = Pattern.compile("file:");
 
     private final PklLoaderSettings settings;
+    private final @Nullable PklStaticModules staticModules;
 
     /**
      * Default constructor, reading the loader settings from system properties and
-     * environment variables.
+     * environment variables, and the modules evaluated at build time from the static optimizations.
      */
     public PklPropertySourceLoader() {
-        this(PklLoaderSettings.load());
+        this(PklLoaderSettings.load(), StaticOptimizations.get(PklStaticModules.class).orElse(null));
     }
 
     /**
@@ -123,7 +129,18 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
      * @param settings The settings
      */
     PklPropertySourceLoader(PklLoaderSettings settings) {
+        this(settings, null);
+    }
+
+    /**
+     * Constructor for tests.
+     *
+     * @param settings      The settings
+     * @param staticModules The modules evaluated at build time, may be {@code null}
+     */
+    PklPropertySourceLoader(PklLoaderSettings settings, @Nullable PklStaticModules staticModules) {
         this.settings = settings;
+        this.staticModules = staticModules;
     }
 
     @Override
@@ -177,30 +194,23 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
             return Optional.empty();
         }
         String path = fileName + "." + EXTENSION;
-        Optional<URL> resource = resourceLoader.getResource(path);
-        if (resource.isEmpty()) {
-            log().debug("No PropertySource found for file name: {}", path);
-            return Optional.empty();
-        }
-        log().debug("Found PropertySource for file name: {}", path);
-        URL url = resource.get();
         // Everything that is not an explicit file system location is a classpath resource: the Environment
         // itself (which the DefaultEnvironment passes for the classpath:/ location), a ClassPathResourceLoader,
         // or a GraalVM native image resource. Those resolve through the module path.
         boolean modulePath = !(resourceLoader instanceof FileSystemResourceLoader);
-        String text = deriveFromBase(resourceLoader, readText(resourceLoader, path), baseName, modulePath);
-
-        ModuleSource source;
-        Path rootDir = null;
-        if (modulePath) {
-            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
+        Map<String, Object> precomputed = modulePath && staticModules != null ? staticModules.find(path) : null;
+        Map<String, Object> properties;
+        if (precomputed != null) {
+            log().debug("Using the properties of {} evaluated at build time", path);
+            // a property source of its own, as an evaluated module would have, rather than the shared static map
+            properties = new LinkedHashMap<>(precomputed);
         } else {
-            Path file = toPath(url);
-            rootDir = file.getParent();
-            source = ModuleSource.create(file.toUri(), text);
+            Optional<Map<String, Object>> evaluated = evaluateModule(resourceLoader, path, baseName, modulePath);
+            if (evaluated.isEmpty()) {
+                return Optional.empty();
+            }
+            properties = evaluated.get();
         }
-
-        Map<String, Object> properties = evaluate(path, source, classLoaderOf(resourceLoader), rootDir, text);
         if (properties.isEmpty()) {
             return Optional.empty();
         }
@@ -216,6 +226,27 @@ public class PklPropertySourceLoader implements PropertySourceLoader, Ordered {
                 return origin;
             }
         });
+    }
+
+    private Optional<Map<String, Object>> evaluateModule(ResourceLoader resourceLoader, String path, @Nullable String baseName, boolean modulePath) {
+        Optional<URL> resource = resourceLoader.getResource(path);
+        if (resource.isEmpty()) {
+            log().debug("No PropertySource found for file name: {}", path);
+            return Optional.empty();
+        }
+        log().debug("Found PropertySource for file name: {}", path);
+        String text = deriveFromBase(resourceLoader, readText(resourceLoader, path), baseName, modulePath);
+
+        ModuleSource source;
+        Path rootDir = null;
+        if (modulePath) {
+            source = ModuleSource.create(URI.create("modulepath:/" + path), text);
+        } else {
+            Path file = toPath(resource.get());
+            rootDir = file.getParent();
+            source = ModuleSource.create(file.toUri(), text);
+        }
+        return Optional.of(evaluate(path, source, classLoaderOf(resourceLoader), rootDir, text));
     }
 
     /**

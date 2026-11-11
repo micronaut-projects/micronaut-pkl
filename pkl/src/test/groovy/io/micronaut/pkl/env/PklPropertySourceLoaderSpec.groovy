@@ -1,10 +1,15 @@
 package io.micronaut.pkl.env
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.context.env.ActiveEnvironment
 import io.micronaut.context.env.Environment
+import io.micronaut.context.env.MapPropertySource
 import io.micronaut.context.exceptions.ConfigurationException
+import io.micronaut.core.io.file.DefaultFileSystemResourceLoader
+import io.micronaut.core.io.scan.ClassPathResourceLoader
 import spock.lang.Specification
 
+import java.nio.file.Path
 import java.time.Duration
 
 class PklPropertySourceLoaderSpec extends Specification {
@@ -122,6 +127,52 @@ class PklPropertySourceLoaderSpec extends Specification {
         expect:
         !loader.enabled
         !loader.load("application", io.micronaut.core.io.scan.ClassPathResourceLoader.defaultLoader(getClass().classLoader)).present
+    }
+
+    void "a classpath module evaluated at build time is served without evaluating it"() {
+        given:
+        PklStaticModules staticModules = new PklStaticModules(["application.pkl": ["precomputed": "yes"] as Map<String, Object>])
+        PklPropertySourceLoader loader = new PklPropertySourceLoader(PklLoaderSettings.load({ k -> null }, { k -> null }), staticModules)
+
+        when:
+        MapPropertySource source = loader.load("application", ClassPathResourceLoader.defaultLoader(getClass().classLoader)).get() as MapPropertySource
+
+        then:
+        source.asMap() == ["precomputed": "yes"]
+        !source.asMap().is(staticModules.find("application.pkl"))
+        source.name == "application"
+        source.order == loader.order
+        source.origin.location() == "application.pkl"
+    }
+
+    void "a module not evaluated at build time is evaluated when it is loaded"() {
+        given:
+        PklStaticModules staticModules = new PklStaticModules(["application.pkl": ["precomputed": "yes"] as Map<String, Object>])
+        PklPropertySourceLoader loader = new PklPropertySourceLoader(PklLoaderSettings.load({ k -> null }, { k -> null }), staticModules)
+
+        when:
+        MapPropertySource source = loader.loadEnv("application", ClassPathResourceLoader.defaultLoader(getClass().classLoader), ActiveEnvironment.of("test", 0)).get() as MapPropertySource
+
+        then:
+        source.get("micronaut.server.port") == 9090
+        source.get("micronaut.application.name") == "pkl-test-test"
+        source.order == loader.order + 1
+    }
+
+    void "modules evaluated at build time do not replace file system modules or a disabled loader"() {
+        given:
+        PklStaticModules staticModules = new PklStaticModules(["application.pkl": ["precomputed": "yes"] as Map<String, Object>])
+        PklPropertySourceLoader loader = new PklPropertySourceLoader(PklLoaderSettings.load({ k -> null }, { k -> null }), staticModules)
+        PklPropertySourceLoader disabled = new PklPropertySourceLoader(PklLoaderSettings.load({ k -> k == PklLoaderSettings.PREFIX + "enabled" ? "false" : null }, { k -> null }), staticModules)
+        Path resources = Path.of(getClass().classLoader.getResource("application.pkl").toURI()).parent
+
+        when:
+        MapPropertySource source = loader.load("application", new DefaultFileSystemResourceLoader(resources)).get() as MapPropertySource
+
+        then:
+        source.get("micronaut.application.name") == "pkl-test"
+        !source.get("precomputed")
+        !disabled.load("application", ClassPathResourceLoader.defaultLoader(getClass().classLoader)).present
     }
 
     void "settings are read from system properties and environment variables"() {

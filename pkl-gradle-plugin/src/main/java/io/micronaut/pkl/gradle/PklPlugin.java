@@ -15,12 +15,22 @@
  */
 package io.micronaut.pkl.gradle;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.provider.MapProperty;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskProvider;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * The {@code io.micronaut.pkl} Gradle plugin. It registers the {@code generatePklSchema} task,
@@ -43,9 +53,14 @@ public final class PklPlugin implements Plugin<Project> {
      */
     public static final String GENERATE_SCHEMA_TASK = "generatePklSchema";
 
+    private static final String AOT_PLUGIN_ID = "io.micronaut.aot";
+    private static final String AOT_PLUGINS_CONFIGURATION = "aotPlugins";
+    private static final String AOT_OPTIMIZATION_ENABLED = "pkl.to.java.config.enabled";
+
     @Override
     public void apply(Project project) {
         PklExtension extension = project.getExtensions().create(EXTENSION_NAME, PklExtension.class);
+        extension.getConvertToJava().convention(false);
         extension.getGenerateSchema().convention(true);
         extension.getSchemaModuleName().convention("Micronaut");
         extension.getSchemaOutputDirectory().convention(project.getLayout().getBuildDirectory().dir("generated/pkl"));
@@ -70,5 +85,47 @@ public final class PklPlugin implements Plugin<Project> {
             );
             main.getResources().srcDir(generateTask.flatMap(GeneratePklSchemaTask::getOutputDirectory));
         });
+
+        project.getPluginManager().withPlugin(AOT_PLUGIN_ID, ignored -> configureAot(project, extension));
+    }
+
+    /**
+     * Adds the {@code pkl.to.java.config} optimization to the Micronaut AOT plugin when
+     * {@code convertToJava} is set. The AOT extension is reached reflectively, because the Micronaut
+     * Gradle plugin may be loaded by a class loader this plugin cannot see.
+     *
+     * @param project   The project
+     * @param extension The extension
+     */
+    private static void configureAot(Project project, PklExtension extension) {
+        project.getConfigurations().named(AOT_PLUGINS_CONFIGURATION).configure(configuration ->
+            configuration.getDependencies().addAllLater(extension.getConvertToJava().map(convert -> convert
+                ? List.<Dependency>of(project.getDependencies().create("io.micronaut.pkl:micronaut-pkl-aot:" + pluginVersion()))
+                : List.<Dependency>of())));
+        Object micronaut = project.getExtensions().getByName("micronaut");
+        Object aot = ((ExtensionAware) micronaut).getExtensions().getByName("aot");
+        aotConfigurationProperties(aot).put(AOT_OPTIMIZATION_ENABLED, extension.getConvertToJava().map(String::valueOf));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static MapProperty<String, String> aotConfigurationProperties(Object aot) {
+        try {
+            return (MapProperty<String, String>) aot.getClass().getMethod("getConfigurationProperties").invoke(aot);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new GradleException("Unable to configure the Micronaut AOT plugin for Pkl: " + e.getMessage(), e);
+        }
+    }
+
+    private static String pluginVersion() {
+        try (InputStream input = PklPlugin.class.getResourceAsStream("micronaut-pkl-gradle-plugin.properties")) {
+            if (input == null) {
+                throw new GradleException("The Micronaut Pkl Gradle plugin was built without its version resource");
+            }
+            Properties properties = new Properties();
+            properties.load(input);
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            throw new GradleException("Unable to read the Micronaut Pkl Gradle plugin version: " + e.getMessage(), e);
+        }
     }
 }

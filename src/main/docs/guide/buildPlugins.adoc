@@ -37,6 +37,7 @@ micronautPkl {
     schemaModuleName = 'Micronaut'                               // the module and file name
     schemaOutputDirectory = layout.projectDirectory.dir('src/main/pkl') // write into the source tree instead
     schemaClasspath.from(configurations.runtimeClasspath)        // defaults to the runtime classpath and the main classes
+    convertToJava = false                                        // with io.micronaut.aot, evaluate Pkl at build time
 }
 ----
 

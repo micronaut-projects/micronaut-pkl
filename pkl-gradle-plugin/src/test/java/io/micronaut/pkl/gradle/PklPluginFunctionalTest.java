@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PklPluginFunctionalTest {
 
     private static final String MICRONAUT_VERSION = System.getProperty("micronautVersion", "5.2.2");
+    private static final String MICRONAUT_GRADLE_PLUGIN_VERSION = System.getProperty("micronautGradlePluginVersion", "5.0.2");
 
     @Test
     void generatesTheSchemaFromTheClasspathAndPackagesItAsAResource(@TempDir Path projectDir) throws IOException {
@@ -101,6 +102,69 @@ micronautPkl {
         Path generated = projectDir.resolve("src/main/pkl/AppConfig.pkl");
         assertTrue(Files.exists(generated));
         assertTrue(Files.readString(generated).contains("open module AppConfig"));
+    }
+
+    @Test
+    void convertToJavaAddsTheOptimizationToMicronautAot(@TempDir Path projectDir) throws IOException {
+        writeAotProject(projectDir, "micronautPkl { convertToJava = true }");
+
+        BuildResult result = GradleRunner.create()
+            .withProjectDir(projectDir.toFile())
+            .withArguments("writeJitAOTConfig", "printAotPlugins", "--stacktrace")
+            .withPluginClasspath()
+            .build();
+
+        String version;
+        try (var input = PklPlugin.class.getResourceAsStream("micronaut-pkl-gradle-plugin.properties")) {
+            var properties = new java.util.Properties();
+            properties.load(input);
+            version = properties.getProperty("version");
+        }
+        assertTrue(result.getOutput().contains("AOT plugin io.micronaut.pkl:micronaut-pkl-aot:" + version), result.getOutput());
+        String config = Files.readString(projectDir.resolve("build/generated/aot/jit.properties"));
+        assertTrue(config.contains("pkl.to.java.config.enabled=true"), config);
+    }
+
+    @Test
+    void theOptimizationIsOffByDefault(@TempDir Path projectDir) throws IOException {
+        writeAotProject(projectDir, "");
+
+        BuildResult result = GradleRunner.create()
+            .withProjectDir(projectDir.toFile())
+            .withArguments("writeJitAOTConfig", "printAotPlugins", "--stacktrace")
+            .withPluginClasspath()
+            .build();
+
+        assertFalse(result.getOutput().contains("micronaut-pkl-aot"), result.getOutput());
+        String config = Files.readString(projectDir.resolve("build/generated/aot/jit.properties"));
+        assertTrue(config.contains("pkl.to.java.config.enabled=false"), config);
+    }
+
+    private static void writeAotProject(Path projectDir, String pklConfiguration) throws IOException {
+        Files.writeString(projectDir.resolve("settings.gradle"), "rootProject.name = 'pkl-aot-testkit'\n");
+        Files.writeString(projectDir.resolve("build.gradle"), """
+plugins {
+    id 'io.micronaut.minimal.application' version '%1$s'
+    id 'io.micronaut.aot' version '%1$s'
+    id 'io.micronaut.pkl'
+}
+repositories {
+    mavenCentral()
+}
+micronaut {
+    version = '%2$s'
+}
+application {
+    mainClass = 'example.Application'
+}
+%3$s
+tasks.register('printAotPlugins') {
+    def plugins = configurations.aotPlugins.dependencies
+    doLast {
+        plugins.each { println "AOT plugin ${it.group}:${it.name}:${it.version}" }
+    }
+}
+""".formatted(MICRONAUT_GRADLE_PLUGIN_VERSION, MICRONAUT_VERSION, pklConfiguration));
     }
 
     @Test

@@ -35,6 +35,19 @@ import org.gradle.api.provider.Property;
 public interface PklExtension {
 
     /**
+     * Whether the Micronaut AOT optimized binaries evaluate the Pkl configuration modules at build time
+     * instead of at startup. When {@code true} and the {@code io.micronaut.aot} plugin is applied, this adds
+     * {@code micronaut-pkl-aot} to the {@code aotPlugins} configuration and enables its {@code pkl.to.java.config}
+     * optimization, so that the optimized application does not load Pkl unless a module must be evaluated at
+     * run time. A module that reads a resource other than a {@code modulepath:} one, such as an {@code env:}
+     * or {@code prop:} resource, is still evaluated at startup.
+     * Defaults to {@code false}.
+     *
+     * @return Whether to convert Pkl configuration to Java in AOT optimized binaries
+     */
+    Property<Boolean> getConvertToJava();
+
+    /**
      * @return Whether to generate the schema module. Defaults to {@code true}
      */
     Property<Boolean> getGenerateSchema();
