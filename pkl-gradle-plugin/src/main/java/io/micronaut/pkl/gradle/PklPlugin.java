@@ -102,7 +102,7 @@ public final class PklPlugin implements Plugin<Project> {
         DependencyHandler dependencies = project.getDependencies();
         project.getConfigurations().named(AOT_PLUGINS_CONFIGURATION).configure(configuration ->
             configuration.withDependencies(declared -> {
-                if (extension.getConvertToJava().get()) {
+                if (Boolean.TRUE.equals(extension.getConvertToJava().getOrNull())) {
                     declared.add(dependencies.create("io.micronaut.pkl:micronaut-pkl-aot:" + pluginVersion()));
                 }
             }));

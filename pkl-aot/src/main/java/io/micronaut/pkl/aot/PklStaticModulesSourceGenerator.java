@@ -162,9 +162,11 @@ public class PklStaticModulesSourceGenerator extends AbstractCodeGenerator {
         }
         List<String> runtimeReads = loader.runtimeReads();
         if (!runtimeReads.isEmpty()) {
-            LOG.warn("Pkl module [{}] reads {} and is evaluated when the application starts instead of being converted to Java. "
-                + "Use a Micronaut placeholder such as \"${NAME:default}\" for values that must come from the run-time environment.",
-                path, String.join(", ", runtimeReads));
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Pkl module [{}] reads {} and is evaluated when the application starts instead of being converted to Java. "
+                    + "Use a Micronaut placeholder such as \"${NAME:default}\" for values that must come from the run-time environment.",
+                    path, String.join(", ", runtimeReads));
+            }
             return;
         }
         if (source.get() instanceof MapPropertySource mapPropertySource) {
