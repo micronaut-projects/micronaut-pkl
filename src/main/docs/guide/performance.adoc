@@ -6,7 +6,22 @@ For most services the cost is acceptable. Where startup time matters, for exampl
 * Run on a GraalVM JDK or as a GraalVM native image, where the interpreter starts faster.
 * Set `-Dpolyglot.engine.WarnInterpreterOnly=false` if you see Truffle's interpreter warning on other JDKs; the loader sets it when the property is unset.
 
-A build-time optimisation for https://micronaut-projects.github.io/micronaut-aot/latest/guide/[Micronaut AOT] that evaluates `.pkl` modules during the build and replaces them with a static property source, removing the evaluator from the deployed artifact, is planned.
+=== Evaluating Pkl at build time with Micronaut AOT
+
+With https://micronaut-projects.github.io/micronaut-aot/latest/guide/[Micronaut AOT], the `pkl.to.java.config` optimization in `micronaut-pkl-aot` evaluates the configuration modules during the build and generates a class holding their properties, so the optimized application starts without loading Pkl or Truffle. It is off by default. With the Gradle plugin and `io.micronaut.aot` applied:
+
+[source,groovy]
+----
+micronautPkl {
+    convertToJava = true
+}
+----
+
+With Maven, add `io.micronaut.pkl:micronaut-pkl-aot` to the `aotDependencies` of `micronaut-maven-plugin` and set `pkl.to.java.config.enabled=true` in `aot.properties`.
+
+The optimization converts `application.pkl`, `bootstrap.pkl` and the `application-{env}.pkl` modules of the environments listed in the AOT `possible.environments` or `target.environments` settings. Any other module is still evaluated at startup, so the `.pkl` files stay in the artifact, and so do the `pkl-core` and Truffle JARs.
+
+A module that reads any resource other than a `modulepath:` one, such as an `env:`, `prop:` or `https:` resource, is not converted, because the build machine's values would be frozen into the artifact. Neither is a module containing a `NaN` or infinite `Float`. The build logs a warning and the module is evaluated at startup instead. To convert such a module, replace `read?("env:PORT") ?? 8080` with a Micronaut placeholder such as `"${PORT:8080}"`, which the Environment resolves when the application starts. The `micronaut.config.pkl.*` settings are read from the process that runs the optimizer.
 
 === GraalVM native image
 

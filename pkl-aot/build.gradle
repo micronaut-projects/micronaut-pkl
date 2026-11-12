@@ -1,0 +1,14 @@
+plugins {
+    id 'io.micronaut.build.internal.pkl-module'
+}
+
+dependencies {
+    // the optimizer runs with the application's classpath, so evaluate with the micronaut-pkl the
+    // application packages rather than the version this module was built with; the Micronaut AOT
+    // optimizer likewise supplies its own API
+    compileOnly projects.micronautPkl
+    compileOnly libs.micronaut.aot.core
+    testImplementation projects.micronautPkl
+    testImplementation libs.micronaut.aot.core
+    testImplementation mn.micronaut.context
+}

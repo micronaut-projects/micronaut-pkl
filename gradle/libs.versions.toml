@@ -24,6 +24,10 @@ graal = "25.4.4.1.1"
 maven = "3.10.0"
 maven-plugin-tools = "3.16.0"
 maven-plugin-testing-harness = "3.5.1"
+# Micronaut AOT API the pkl.to.java.config optimization compiles against: the version Micronaut Platform 5.2
+# manages. The AOT runtime supplies these classes, so use only API that AOT 3.0, which the Micronaut Gradle
+# plugin 5.0 runs by default, also has (the plugin's functional tests run it).
+micronaut-aot = "3.1.0"
 # Managed versions appear in the BOM
 managed-pkl = "0.32.2"
 
@@ -43,6 +47,7 @@ maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref =
 maven-core = { module = "org.apache.maven:maven-core", version.ref = "maven" }
 maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version.ref = "maven-plugin-tools" }
 maven-plugin-testing-harness = { module = "org.apache.maven.plugin-testing:maven-plugin-testing-harness", version.ref = "maven-plugin-testing-harness" }
+micronaut-aot-core = { module = "io.micronaut.aot:micronaut-aot-core", version.ref = "micronaut-aot" }
 
 #
 # Imported BOMs, also appearing in the generated BOM
