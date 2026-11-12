@@ -159,7 +159,7 @@ application {
 }
 %3$s
 tasks.register('printAotPlugins') {
-    def plugins = configurations.aotPlugins.dependencies
+    def plugins = configurations.aotPlugins.incoming.dependencies
     doLast {
         plugins.each { println "AOT plugin ${it.group}:${it.name}:${it.version}" }
     }

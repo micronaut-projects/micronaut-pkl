@@ -18,7 +18,7 @@ package io.micronaut.pkl.gradle;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.MapProperty;
@@ -29,7 +29,6 @@ import org.gradle.api.tasks.TaskProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -98,10 +97,15 @@ public final class PklPlugin implements Plugin<Project> {
      * @param extension The extension
      */
     private static void configureAot(Project project, PklExtension extension) {
+        // withDependencies reads the extension when the configuration is resolved, so the setting applies
+        // even if something lists the configuration's dependencies before the build script sets it
+        DependencyHandler dependencies = project.getDependencies();
         project.getConfigurations().named(AOT_PLUGINS_CONFIGURATION).configure(configuration ->
-            configuration.getDependencies().addAllLater(extension.getConvertToJava().map(convert -> convert
-                ? List.<Dependency>of(project.getDependencies().create("io.micronaut.pkl:micronaut-pkl-aot:" + pluginVersion()))
-                : List.<Dependency>of())));
+            configuration.withDependencies(declared -> {
+                if (extension.getConvertToJava().get()) {
+                    declared.add(dependencies.create("io.micronaut.pkl:micronaut-pkl-aot:" + pluginVersion()));
+                }
+            }));
         Object micronaut = project.getExtensions().getByName("micronaut");
         Object aot = ((ExtensionAware) micronaut).getExtensions().getByName("aot");
         aotConfigurationProperties(aot).put(AOT_OPTIMIZATION_ENABLED, extension.getConvertToJava().map(String::valueOf));

@@ -74,7 +74,7 @@ final class BuildTimePklPropertySourceLoader extends PklPropertySourceLoader {
      * @param delegate The reader to delegate to
      * @param reads    The URIs read, recorded in order
      */
-    private record RecordingResourceReader(ResourceReader delegate, Set<String> reads) implements ResourceReader {
+    record RecordingResourceReader(ResourceReader delegate, Set<String> reads) implements ResourceReader {
 
         @Override
         public String getUriScheme() {

@@ -180,11 +180,9 @@ public class PklStaticModulesSourceGenerator extends AbstractCodeGenerator {
     }
 
     private static boolean hasNonFiniteNumber(@Nullable Object value) {
+        // a Pkl Float is always a Double
         if (value instanceof Double number) {
             return !Double.isFinite(number);
-        }
-        if (value instanceof Float number) {
-            return !Float.isFinite(number);
         }
         if (value instanceof Collection<?> collection) {
             return collection.stream().anyMatch(PklStaticModulesSourceGenerator::hasNonFiniteNumber);
