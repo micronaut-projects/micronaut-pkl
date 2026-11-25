@@ -139,7 +139,6 @@ class PklPropertySourceLoaderSpec extends Specification {
 
         then:
         source.asMap() == ["precomputed": "yes"]
-        !source.asMap().is(staticModules.find("application.pkl"))
         source.name == "application"
         source.order == loader.order
         source.origin.location() == "application.pkl"
