@@ -26,11 +26,30 @@ afterEvaluate {
     }
 }
 
+// the Micronaut Gradle plugin the tests apply in process is published to the plugin portal only
+repositories {
+    gradlePluginPortal {
+        content {
+            onlyForConfigurations('testCompileClasspath', 'testRuntimeClasspath')
+        }
+    }
+}
+
+// The plugin adds micronaut-pkl-aot of its own version to the AOT optimizer's classpath
+def versionResources = layout.buildDirectory.dir('generated/version-resources')
+def writePluginVersion = tasks.register('writePluginVersion', WriteProperties) {
+    destinationFile = versionResources.map { it.file('io/micronaut/pkl/gradle/micronaut-pkl-gradle-plugin.properties') }
+    property('version', project.version)
+}
+sourceSets.main.resources.srcDir(files(versionResources).builtBy(writePluginVersion))
+
 dependencies {
     implementation projects.micronautPklGenerator
     testImplementation gradleTestKit()
     testImplementation mnTest.junit.jupiter.api
     testImplementation mn.micronaut.context
+    // applies the Micronaut AOT plugin in process; the TestKit tests resolve it from the plugin portal instead
+    testImplementation libs.gradle.micronaut
     testRuntimeOnly mnTest.junit.jupiter.engine
     testRuntimeOnly mnTest.junit.platform.launcher
 }

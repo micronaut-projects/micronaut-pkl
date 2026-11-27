@@ -1,0 +1,4 @@
+greeting {
+  fromEnv = read?("env:PKL_AOT_GREETING") ?? "unset"
+  fromProp = read?("prop:pkl.aot.greeting") ?? "unset"
+}

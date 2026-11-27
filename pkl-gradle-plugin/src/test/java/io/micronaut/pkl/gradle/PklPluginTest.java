@@ -15,7 +15,10 @@
  */
 package io.micronaut.pkl.gradle;
 
+import io.micronaut.gradle.aot.AOTExtension;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -23,8 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PklPluginTest {
@@ -44,6 +50,41 @@ class PklPluginTest {
         assertEquals("Micronaut", task.getModuleName().get());
         assertEquals(outputDirectory, task.getOutputDirectory().get().getAsFile().toPath());
         assertTrue(sourceSets.getByName("main").getResources().getSrcDirs().contains(outputDirectory.toFile()));
+    }
+
+    @Test
+    void convertToJavaConfiguresMicronautAot(@TempDir Path tempDir) {
+        Project project = aotProject(tempDir);
+        PklExtension extension = project.getExtensions().getByType(PklExtension.class);
+        AOTExtension aot = (AOTExtension) ((ExtensionAware) project.getExtensions().getByName("micronaut")).getExtensions().getByName("aot");
+
+        assertEquals("false", aot.getConfigurationProperties().get().get("pkl.to.java.config.enabled"));
+        // iterating the declared dependencies first, as other plugins may, must not freeze the setting
+        List<String> declared = new ArrayList<>();
+        project.getConfigurations().getByName("aotPlugins").getDependencies().forEach(d -> declared.add(d.getName()));
+        assertEquals(List.of(), declared);
+
+        extension.getConvertToJava().set(true);
+
+        assertEquals("true", aot.getConfigurationProperties().get().get("pkl.to.java.config.enabled"));
+        List<Dependency> resolved = new ArrayList<>(project.getConfigurations().getByName("aotPlugins").getIncoming().getDependencies());
+        assertEquals(List.of("io.micronaut.pkl:micronaut-pkl-aot"), resolved.stream().map(d -> d.getGroup() + ":" + d.getName()).toList());
+        assertNotNull(resolved.get(0).getVersion());
+    }
+
+    @Test
+    void noAotPluginIsAddedByDefault(@TempDir Path tempDir) {
+        Project project = aotProject(tempDir);
+
+        assertTrue(project.getConfigurations().getByName("aotPlugins").getIncoming().getDependencies().isEmpty());
+    }
+
+    private static Project aotProject(Path tempDir) {
+        Project project = ProjectBuilder.builder().withProjectDir(tempDir.toFile()).build();
+        project.getPluginManager().apply(PklPlugin.class);
+        project.getPluginManager().apply("io.micronaut.minimal.application");
+        project.getPluginManager().apply("io.micronaut.aot");
+        return project;
     }
 
     @Test
