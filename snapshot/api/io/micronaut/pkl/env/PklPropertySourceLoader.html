@@ -113,6 +113,9 @@ and <code>micronaut.config.pkl.allowed-resources</code> system properties (or th
 <code>MICRONAUT_CONFIG_PKL_*</code> environment variables), and evaluation is bounded by
 <code>micronaut.config.pkl.timeout</code> (10 seconds by default).</p>
 
+<p>A classpath module that the <code>pkl.to.java.config</code> Micronaut AOT optimization evaluated when the
+application was built (see <a href="PklStaticModules.html" title="class in io.micronaut.pkl.env"><code>PklStaticModules</code></a>) is served from its precomputed properties instead.</p>
+
 <p>This loader deliberately does not extend <code>AbstractPropertySourceLoader</code>: the
 environment reads such loaders from an <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a>, which would hide the module's
 location and break relative <code>amends</code> and <code>import</code> clauses.</p></div>
@@ -157,7 +160,7 @@ location and break relative <code>amends</code> and <code>import</code> clauses.
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">PklPropertySourceLoader</a>()</code></div>
 <div class="col-last even-row-color">
 <div class="block">Default constructor, reading the loader settings from system properties and
-environment variables.</div>
+environment variables, and the modules evaluated at build time from the static optimizations.</div>
 </div>
 </div>
 </section>
@@ -258,7 +261,7 @@ environment variables.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PklPropertySourceLoader</span>()</div>
 <div class="block">Default constructor, reading the loader settings from system properties and
-environment variables.</div>
+environment variables, and the modules evaluated at build time from the static optimizations.</div>
 </div>
 </section>
 </li>

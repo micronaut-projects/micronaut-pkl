@@ -1,3 +1,4 @@
+io.micronaut.pkl.aot
 io.micronaut.pkl.env
 io.micronaut.pkl.generator
 io.micronaut.pkl.gradle

@@ -56,6 +56,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#getConvertToJava()" tabindex="0">getConvertToJava()</a></li>
 <li><a href="#getGenerateSchema()" tabindex="0">getGenerateSchema()</a></li>
 <li><a href="#getSchemaModuleName()" tabindex="0">getSchemaModuleName()</a></li>
 <li><a href="#getSchemaOutputDirectory()" tabindex="0">getSchemaOutputDirectory()</a></li>
@@ -103,17 +104,23 @@ micronautPkl {
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.provider.Property<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getGenerateSchema()" class="member-name-link">getGenerateSchema</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.file.ConfigurableFileCollection</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getSchemaClasspath()" class="member-name-link">getSchemaClasspath</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getConvertToJava()" class="member-name-link">getConvertToJava</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Whether the Micronaut AOT optimized binaries evaluate the Pkl configuration modules at build time
+instead of at startup.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.provider.Property<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getGenerateSchema()" class="member-name-link">getGenerateSchema</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.provider.Property<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getSchemaModuleName()" class="member-name-link">getSchemaModuleName</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.file.ConfigurableFileCollection</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getSchemaClasspath()" class="member-name-link">getSchemaClasspath</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.file.DirectoryProperty</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getSchemaOutputDirectory()" class="member-name-link">getSchemaOutputDirectory</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.provider.Property<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getSchemaModuleName()" class="member-name-link">getSchemaModuleName</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.gradle.api.file.DirectoryProperty</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getSchemaOutputDirectory()" class="member-name-link">getSchemaOutputDirectory</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -128,6 +135,25 @@ micronautPkl {
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="getConvertToJava()">
+<h3>getConvertToJava</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">org.gradle.api.provider.Property&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</span>&nbsp;<span class="element-name">getConvertToJava</span>()</div>
+<div class="block">Whether the Micronaut AOT optimized binaries evaluate the Pkl configuration modules at build time
+instead of at startup. When <code>true</code> and the <code>io.micronaut.aot</code> plugin is applied, this adds
+<code>micronaut-pkl-aot</code> to the <code>aotPlugins</code> configuration and enables its <code>pkl.to.java.config</code>
+optimization, so that the optimized application does not load Pkl unless a module must be evaluated at
+run time. A module that reads a resource other than a <code>modulepath:</code> one, such as an <code>env:</code>
+or <code>prop:</code> resource, is still evaluated at startup.
+Defaults to <code>false</code>.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>Whether to convert Pkl configuration to Java in AOT optimized binaries</dd>
+</dl>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="getGenerateSchema()">
 <h3>getGenerateSchema</h3>

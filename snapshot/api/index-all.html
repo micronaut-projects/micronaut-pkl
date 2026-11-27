@@ -68,6 +68,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">The default module name.</div>
 </dd>
+<dt><a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html#DESCRIPTION" class="member-name-link">DESCRIPTION</a> - Static variable in class io.micronaut.pkl.aot.<a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html" title="class in io.micronaut.pkl.aot">PklStaticModulesSourceGenerator</a></dt>
+<dd>
+<div class="block">The description of the optimization.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
@@ -104,6 +108,8 @@ configuration loaders do: a map becomes a prefix and a non-null value a property
 <dd>
 <div class="block">Generates the module.</div>
 </dd>
+<dt><a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html#generate(io.micronaut.aot.core.AOTContext)" class="member-name-link">generate(AOTContext)</a> - Method in class io.micronaut.pkl.aot.<a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html" title="class in io.micronaut.pkl.aot">PklStaticModulesSourceGenerator</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/pkl/generator/PklSchemaGenerator.html#generate(java.util.Collection)" class="member-name-link">generate(Collection)</a> - Static method in class io.micronaut.pkl.generator.<a href="io/micronaut/pkl/generator/PklSchemaGenerator.html" title="class in io.micronaut.pkl.generator">PklSchemaGenerator</a></dt>
 <dd>
 <div class="block">Generates a Pkl module named <a href="io/micronaut/pkl/generator/PklSchemaGenerator.html#DEFAULT_MODULE_NAME">"Micronaut"</a> from the given schemas.</div>
@@ -131,6 +137,11 @@ classpath.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/pkl/gradle/GeneratePklSchemaTask.html#getClasspath()" class="member-name-link">getClasspath()</a> - Method in class io.micronaut.pkl.gradle.<a href="io/micronaut/pkl/gradle/GeneratePklSchemaTask.html" title="class in io.micronaut.pkl.gradle">GeneratePklSchemaTask</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/pkl/gradle/PklExtension.html#getConvertToJava()" class="member-name-link">getConvertToJava()</a> - Method in interface io.micronaut.pkl.gradle.<a href="io/micronaut/pkl/gradle/PklExtension.html" title="interface in io.micronaut.pkl.gradle">PklExtension</a></dt>
+<dd>
+<div class="block">Whether the Micronaut AOT optimized binaries evaluate the Pkl configuration modules at build time
+instead of at startup.</div>
+</dd>
 <dt><a href="io/micronaut/pkl/env/PklPropertySourceLoader.html#getExtensions()" class="member-name-link">getExtensions()</a> - Method in class io.micronaut.pkl.env.<a href="io/micronaut/pkl/env/PklPropertySourceLoader.html" title="class in io.micronaut.pkl.env">PklPropertySourceLoader</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/pkl/gradle/PklExtension.html#getGenerateSchema()" class="member-name-link">getGenerateSchema()</a> - Method in interface io.micronaut.pkl.gradle.<a href="io/micronaut/pkl/gradle/PklExtension.html" title="interface in io.micronaut.pkl.gradle">PklExtension</a></dt>
@@ -150,6 +161,15 @@ classpath.</div>
 </dl>
 <h2 class="title" id="I:I">I</h2>
 <dl class="index">
+<dt><a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html#ID" class="member-name-link">ID</a> - Static variable in class io.micronaut.pkl.aot.<a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html" title="class in io.micronaut.pkl.aot">PklStaticModulesSourceGenerator</a></dt>
+<dd>
+<div class="block">The identifier of the optimization.</div>
+</dd>
+<dt><a href="io/micronaut/pkl/aot/package-summary.html">io.micronaut.pkl.aot</a> - package io.micronaut.pkl.aot</dt>
+<dd>
+<div class="block">The <code>pkl.to.java.config</code> Micronaut AOT optimization, which evaluates Pkl configuration
+modules when the application is built.</div>
+</dd>
 <dt><a href="io/micronaut/pkl/env/package-summary.html">io.micronaut.pkl.env</a> - package io.micronaut.pkl.env</dt>
 <dd>
 <div class="block">Support for loading Micronaut configuration from Apple Pkl modules.</div>
@@ -187,6 +207,10 @@ schemas on the project's classpath.</div>
 <dd>
 <div class="block">Runs the generator.</div>
 </dd>
+<dt><a href="io/micronaut/pkl/info/MicronautPklAotModuleInfo.html" class="type-name-link" title="class in io.micronaut.pkl.info">MicronautPklAotModuleInfo</a> - Class in <a href="io/micronaut/pkl/info/package-summary.html">io.micronaut.pkl.info</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/pkl/info/MicronautPklAotModuleInfo.html#%3Cinit%3E()" class="member-name-link">MicronautPklAotModuleInfo()</a> - Constructor for class io.micronaut.pkl.info.<a href="io/micronaut/pkl/info/MicronautPklAotModuleInfo.html" title="class in io.micronaut.pkl.info">MicronautPklAotModuleInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/pkl/info/MicronautPklGeneratorModuleInfo.html" class="type-name-link" title="class in io.micronaut.pkl.info">MicronautPklGeneratorModuleInfo</a> - Class in <a href="io/micronaut/pkl/info/package-summary.html">io.micronaut.pkl.info</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/pkl/info/MicronautPklGeneratorModuleInfo.html#%3Cinit%3E()" class="member-name-link">MicronautPklGeneratorModuleInfo()</a> - Constructor for class io.micronaut.pkl.info.<a href="io/micronaut/pkl/info/MicronautPklGeneratorModuleInfo.html" title="class in io.micronaut.pkl.info">MicronautPklGeneratorModuleInfo</a></dt>
@@ -229,7 +253,7 @@ and exposes the result as configuration.</div>
 <dt><a href="io/micronaut/pkl/env/PklPropertySourceLoader.html#%3Cinit%3E()" class="member-name-link">PklPropertySourceLoader()</a> - Constructor for class io.micronaut.pkl.env.<a href="io/micronaut/pkl/env/PklPropertySourceLoader.html" title="class in io.micronaut.pkl.env">PklPropertySourceLoader</a></dt>
 <dd>
 <div class="block">Default constructor, reading the loader settings from system properties and
-environment variables.</div>
+environment variables, and the modules evaluated at build time from the static optimizations.</div>
 </dd>
 <dt><a href="io/micronaut/pkl/generator/PklSchemaGenerator.html" class="type-name-link" title="class in io.micronaut.pkl.generator">PklSchemaGenerator</a> - Class in <a href="io/micronaut/pkl/generator/package-summary.html">io.micronaut.pkl.generator</a></dt>
 <dd>
@@ -241,6 +265,20 @@ module that describes every known configuration property as a typed class tree.<
 <div class="block">Command line entry point that writes a Pkl schema module for the configuration schemas found
 on a classpath.</div>
 </dd>
+<dt><a href="io/micronaut/pkl/env/PklStaticModules.html" class="type-name-link" title="class in io.micronaut.pkl.env">PklStaticModules</a> - Class in <a href="io/micronaut/pkl/env/package-summary.html">io.micronaut.pkl.env</a></dt>
+<dd>
+<div class="block">The flattened properties of Pkl modules that were evaluated when the application was built, keyed
+by module path (for example <code>application.pkl</code> or <code>application-dev.pkl</code>).</div>
+</dd>
+<dt><a href="io/micronaut/pkl/env/PklStaticModules.html#%3Cinit%3E(java.util.Map)" class="member-name-link">PklStaticModules(Map)</a> - Constructor for class io.micronaut.pkl.env.<a href="io/micronaut/pkl/env/PklStaticModules.html" title="class in io.micronaut.pkl.env">PklStaticModules</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html" class="type-name-link" title="class in io.micronaut.pkl.aot">PklStaticModulesSourceGenerator</a> - Class in <a href="io/micronaut/pkl/aot/package-summary.html">io.micronaut.pkl.aot</a></dt>
+<dd>
+<div class="block">A Micronaut AOT optimization that evaluates the application's Pkl configuration modules when the
+application is built, so that Pkl and its Truffle runtime are not loaded when it starts.</div>
+</dd>
+<dt><a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html#%3Cinit%3E()" class="member-name-link">PklStaticModulesSourceGenerator()</a> - Constructor for class io.micronaut.pkl.aot.<a href="io/micronaut/pkl/aot/PklStaticModulesSourceGenerator.html" title="class in io.micronaut.pkl.aot">PklStaticModulesSourceGenerator</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/pkl/env/PklValues.html" class="type-name-link" title="class in io.micronaut.pkl.env">PklValues</a> - Class in <a href="io/micronaut/pkl/env/package-summary.html">io.micronaut.pkl.env</a></dt>
 <dd>
 <div class="block">Converts the values of an evaluated Pkl module into the plain Java values a
